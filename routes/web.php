@@ -18,6 +18,10 @@ Route::get('/', function () {
     return Inertia::render('Homepage');
 });
 
+Route::get('/wiwa', function () {
+    return Inertia::render('LoginPage');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
