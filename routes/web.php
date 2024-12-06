@@ -18,7 +18,7 @@ Route::get('/', function () {
     return Inertia::render('Homepage');
 });
 
-Route::get('/wiwa', function () {
+Route::get('/signin', function () {
     return Inertia::render('LoginPage');
 });
 
@@ -32,4 +32,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -1,13 +1,19 @@
 
 import React from 'react';
+import logo from '../../../public/logo.png'
 import { Head, Link } from '@inertiajs/react';
-import LogCard from "@/Components/LoginPage/LogCard.jsx";
 
 export default function Homepage(props) {
     return (
-        <div className='min-h-screen bg-gradient-to-r from-blue-700 from-10% via-blue-900 via-30% to-black ]'>
-            <head className='font-family: "Philosopher", serif flex left-3 text-white '>SIPIKA</head>
-            <LogCard></LogCard>
+        <div>
+            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-[51px] flex justify-between'>
+                <div className='left-header'>
+                    <img src={logo} alt="logo-sipika" width={146} />
+                </div>
+                <div className='right-header'>
+                    <p className='text-white'>Anak Agung Gede Ngurah Ananda Wirasena ( Mahasiswa )</p>
+                </div>
+            </header>
         </div>
     )
 }
