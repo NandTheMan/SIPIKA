@@ -14,8 +14,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                philosopher: ['Philosopher', ...defaultTheme.fontFamily.sans],
+                montserrat: ['Montserrat', ...defaultTheme.fontFamily.sans],
             },
+
+            colors: {
+                textBoxBlue: '#495e8f',
+                buttonBlue: '#576c9c',
+                buttonBlueHover: '#364a78',
+            }
         },
     },
 
