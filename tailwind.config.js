@@ -22,6 +22,15 @@ export default {
                 textBoxBlue: '#495e8f',
                 buttonBlue: '#576c9c',
                 buttonBlueHover: '#364a78',
+            },
+
+            background: {
+
+            },
+
+            backgroundImage: {
+                glassGradient: 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.2) 15%, rgba(255, 255, 255, 0.05) 35%, rgba(255, 255, 255, 0.1) 70%, rgba(255, 255, 255, 0.25))',
+                lightGradient: 'linear-gradient(to bottom, rgba(247, 251, 255) 1%, rgba(252, 253, 255) 15%, rgba(247, 251, 255) 80%, rgba(232, 244, 255) 96%)'
             }
         },
     },

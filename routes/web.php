@@ -15,11 +15,11 @@ use Inertia\Inertia;
 //});
 
 Route::get('/', function () {
-    return Inertia::render('Homepage');
+    return Inertia::render('Bookingpage');
 });
 
 Route::get('/wiwa', function () {
-    return Inertia::render('LoginPage');
+    return Inertia::render('Bookingpage');
 });
 
 Route::get('/dashboard', function () {
