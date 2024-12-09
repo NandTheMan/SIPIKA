@@ -102,5 +102,5 @@ export default function Homepage() {
                 </div>
             </main>
         </div>
-    )
+    );
 }

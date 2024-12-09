@@ -19,8 +19,13 @@ Route::get('/', function () {
 });
 
 Route::get('/signin', function () {
-    return Inertia::render('LoginPage');
+    return Inertia::render('SignInPage');
 });
+
+Route::get('/booking', function () {
+    return Inertia::render('Bookingpage');
+});
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
