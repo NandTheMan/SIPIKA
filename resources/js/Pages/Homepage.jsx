@@ -32,6 +32,13 @@ export default function Homepage() {
         {ruang: "Ruang 1.4", peminjam: "Occa (Informatika)", waktu: "11.00 - 11.50" }
     ];
 
+    const dataRating = [
+        {fotoProfil: '/images/profil1.png', nama: "Nanda", ruang: "Ruang 1.1", rating:"4", deskripsi: "Ruangannya dingin, proyektornya bekerja dnegan baik, hanya saja kebersihannya tidak terjaga dengan baik. Banyak sekali sampah di kolong bangku."},
+        {fotoProfil: '/images/profil1.png', nama: "Albert", ruang: "Ruang 2.4", rating:"3.5", deskripsi: "Ruangannya luas dan cukup dingin, tetapi proyektornya agak main-main dan banyak kotoran di bagian belakang ruangan."},
+        {fotoProfil: '/images/profil1.png', nama: "Rian", ruang: "Ruang 2.1", rating:"3", deskripsi: "Ruangan panas."},
+        {fotoProfil: '/images/profil1.png', nama: "Abhi", ruang: "Ruang 3.2", rating:"3", deskripsi: "Proyektor tidak berfungsi."}
+    ]
+
     return (
         <div>
             <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-[51px] flex justify-between'>
@@ -90,14 +97,14 @@ export default function Homepage() {
                                     <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Ruang</th>
                                     <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Peminjam</th>
                                     <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Waktu</th>
-                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93] w-14'></th>
+                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93] w-[16%]'></th>
                                 </tr>
                                 {dataPeminjaman.map((item)=>(
-                                    <tr key={item.index} >
-                                        <td className='py-2'>{item.ruang}</td>
-                                        <td className='py-2'>{item.peminjam}</td>
-                                        <td className='py-2'>{item.waktu}</td>
-                                        <td className='py-2 text-left'><FontAwesomeIcon icon={faEye} className='fa-lg'/></td>
+                                    <tr key={item.index}>
+                                        <td className='my-2 py-2'>{item.ruang}</td>
+                                        <td className='my-2 py-2'>{item.peminjam}</td>
+                                        <td className='my-2 py-2'>{item.waktu}</td>
+                                        <td className='my-2 py-2 px-3 text-left flex items-center gap-4 bg-[#2D3C93] text-white justify-center mr-14 rounded-lg'><FontAwesomeIcon icon={faEye} className='fa-sm'/> Lihat</td>
                                     </tr>
                                 ))}
                             </table>
@@ -107,8 +114,56 @@ export default function Homepage() {
                 {/* Review Kelas */}
                 <div className='pt-[116px]'>
                     <Title>Review Kelas</Title>
+                    <div className='flex gap-5 pt-[36px]'>
+                    {dataRating.map((item)=>(
+                        <div  class="bg-white p-6 rounded-3xl shadow-xl w-[512px]">
+                            <div class="flex items-center space-x-4">
+                                <div  className="w-12 h-12 rounded-full overflow-hidden">
+                                    <img
+                                        src={item.fotoProfil}
+                                        alt="profil1"
+                                        className='w-full h-full object-cover'/>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-sfprobold">{item.nama}</h3>
+                                    <div class="flex items-center font-sfproreg">
+                                        <p>{item.ruang} (<span className='text-[#2D3C93]'>{item.rating}/5</span>)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-4 ">
+                                {item.deskripsi}
+                            </p>
+                        </div>
+                    ))}
+                    </div>
                 </div>
             </main>
+            <footer className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] text-white p-[54px] flex'>
+                <div className='flex-1'>
+                    <img src={logo} alt="logo-sipika" width={291} className='mb-[38px]'/>
+                    <p>Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana</p>
+                </div>
+                <div className='mx-10 w-fit mr-20'>
+                    <h4 className='font-sfprobold mb-3'>Quick Links</h4>
+                    <div className='flex flex-col gap-1'>
+                        <p>Home</p>
+                        <p>Pinjam Kelas</p>
+                        <p>Lihat Kelas</p>
+                        <p>Lapor Kelas</p>
+                    </div>
+                </div>
+                <div className='flex-1 space-y-10'>
+                    <div>
+                        <h4 className='font-sfprobold mb-3'>Further Information</h4>
+                        <div className='border rounded-lg flex'>
+                        <input type="text" id="username" className='bg-[#0000000A] border-none p-4 flex-1' placeholder="Enter Email"/>
+                            <button type='submit' className='w-fit bg-white text-black rounded-r-lg px-8 font-sfprobold'>Submit</button>
+                        </div>
+                    </div>
+                    <p>Copyright © all right reserve</p>
+                </div>
+            </footer>
         </div>
     );
 }
