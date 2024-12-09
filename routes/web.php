@@ -15,7 +15,15 @@ use Inertia\Inertia;
 //});
 
 Route::get('/', function () {
-    return Inertia::render('Register');
+    return Inertia::render('Homepage');
+});
+
+Route::get('/signin', function () {
+    return Inertia::render('SigninPage');
+});
+
+Route::get('/booking', function () {
+    return Inertia::render('Bookingpage');
 });
 
 Route::get('/dashboard', function () {
