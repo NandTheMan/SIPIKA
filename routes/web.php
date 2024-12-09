@@ -15,12 +15,17 @@ use Inertia\Inertia;
 //});
 
 Route::get('/', function () {
+    return Inertia::render('Homepage');
+});
+
+Route::get('/signin', function () {
+    return Inertia::render('SignInPage');
+});
+
+Route::get('/booking', function () {
     return Inertia::render('Bookingpage');
 });
 
-Route::get('/wiwa', function () {
-    return Inertia::render('Bookingpage');
-});
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -32,4 +37,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

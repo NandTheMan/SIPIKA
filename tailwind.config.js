@@ -14,18 +14,19 @@ export default {
     theme: {
         extend: {
             fontFamily: {
+                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                'sfpromed': ['SFPROMEDIUM', 'roboto', 'sans-serif'],
+                'sfproreg': ['SFPROREGULAR', 'roboto', 'sans-serif'],
+                'sfprobold': ['SFPROBOLD', 'roboto', 'sans-serif'],
                 philosopher: ['Philosopher', ...defaultTheme.fontFamily.sans],
                 montserrat: ['Montserrat', ...defaultTheme.fontFamily.sans],
+
             },
 
             colors: {
                 textBoxBlue: '#495e8f',
                 buttonBlue: '#576c9c',
                 buttonBlueHover: '#364a78',
-            },
-
-            background: {
-
             },
 
             backgroundImage: {
@@ -35,5 +36,11 @@ export default {
         },
     },
 
-    plugins: [forms, daisyui],
+    daisyui: {
+        themes: [],
+    },
+
+    plugins: [require('@tailwindcss/forms'), require('daisyui')],
+
+    
 };
