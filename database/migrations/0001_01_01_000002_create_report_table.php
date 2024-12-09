@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('report', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->unsignedInteger('report_id')->primary()->autoIncrement();
             $table->integer('reported_user_id')->unsigned();
             $table->foreign('reported_user_id')->references('user_id')->on('users');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('report');
+        Schema::dropIfExists('reports');
     }
 };

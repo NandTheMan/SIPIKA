@@ -1,21 +1,13 @@
 <?php
 
+use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-//Route::get('/', function () {
-//    return Inertia::render('Welcome', [
-//        'canLogin' => Route::has('login'),
-//        'canRegister' => Route::has('register'),
-//        'laravelVersion' => Application::VERSION,
-//        'phpVersion' => PHP_VERSION,
-//    ]);
-//});
-
 Route::get('/', function () {
-    return Inertia::render('Homepage');
+    return Inertia::render('dummy');
 });
 
 Route::get('/signin', function () {
@@ -34,6 +26,10 @@ Route::get('/booking', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/classroom', [ClassroomController::class, 'index'])->name('classrooms.index');
+Route::get('/classrooms/create', [ClassroomController::class, 'create'])->name('classrooms.create');
+Route::get('/classrooms', [ClassroomController::class, 'add'])->name('classrooms.add');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

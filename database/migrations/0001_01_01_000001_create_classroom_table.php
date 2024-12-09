@@ -15,8 +15,8 @@ return new class extends Migration
             $table->unsignedInteger('classroom_id')->primary()->autoIncrement();
             $table->string('classroom_name');
             $table->integer('classroom_capacity');
-            $table->integer('floor');
-            $table->boolean('is_booked');
+            $table->integer('classroom_floor');
+            $table->boolean('classroom_is_booked')->default(false);
         });
 
         Schema::create('facilities', function (Blueprint $table) {
@@ -37,7 +37,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classroom');
+        Schema::dropIfExists('classrooms');
         Schema::dropIfExists('facilities');
         Schema::dropIfExists('classroom_facilities');
     }
