@@ -19,7 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/signin', function () {
-    return Inertia::render('SignInPage');
+    return Inertia::render('SigninPage');
 });
 
 Route::get('/booking', function () {

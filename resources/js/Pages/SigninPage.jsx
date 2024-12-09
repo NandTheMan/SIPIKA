@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 
-export default function SignInPage(props) {
+export default function SigninPage(props) {
     return (
         <div
             className="relative min-h-screen bg-cover bg-center flex items-center justify-center"
