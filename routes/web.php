@@ -22,8 +22,12 @@ Route::get('/signin', function () {
     return Inertia::render('SigninPage');
 });
 
+Route::get('/central', function () {
+    return Inertia::render('dummy');
+});
+
 Route::get('/booking', function () {
-    return Inertia::render('Bookingpage');
+    return Inertia::render('BookingPage');
 });
 
 
