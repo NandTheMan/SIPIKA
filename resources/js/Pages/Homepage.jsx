@@ -22,12 +22,14 @@ export default function Homepage() {
     }
 
     const dataPeminjaman = [
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" },
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" },
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" },
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" },
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" },
-        { ruang: "Ruang 1.1", peminjam: "A - Informatika 23", waktu: "11.00 - 11.50" }
+        {ruang: "Ruang 1.1", peminjam: "Agung Gede Ngurah Ananda Wirasena (Informatika)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 3.1", peminjam: "I Gusti Ayu Riyana Astarani (Farmasi)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 1.2", peminjam: "I Gede Abhijana (Farmasi)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 2.1", peminjam: "Akira Rian Satya (Informatika)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 3.3", peminjam: "Albert Effendi (Informatika)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 2.4", peminjam: "Asa Prameswari Karso (Informatika)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 2.2", peminjam: "I Gusti Ayu Riyani Astarani (Farmasi)", waktu: "11.00 - 11.50" },
+        {ruang: "Ruang 1.4", peminjam: "Occa (Informatika)", waktu: "11.00 - 11.50" }
     ];
 
     return (
@@ -76,29 +78,35 @@ export default function Homepage() {
                         </div>
                     </div>
                 </div>
+                {/* Lihat Kelas */}
                 <div className='pt-[116px]'>
                     <Title>Lihat Jadwal</Title>
-                    <div className='py-3 flex items-center gap-5'>
+                    <div className='pt-[36px] flex items-center gap-5 justify-center'>
                         <Calendar onChange={onChange} value={date} id="e-calendar"></Calendar>
-                        <div className='w-fit bg-white p-5 flex-1'>
-							<table>
+                        {/* Tabel Peminjaman */}
+                        <div className='flex-1 bg-white p-5  rounded-xl shadow-lg ml-20 h-[350px] overflow-auto '>
+							<table className='w-full table-auto table-fixed border-collapse text-center'>
                                 <tr>
-                                    <th>Ruang</th>
-                                    <th>Peminjam</th>
-                                    <th>Waktu</th>
-                                    <th></th>
+                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Ruang</th>
+                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Peminjam</th>
+                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Waktu</th>
+                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93] w-14'></th>
                                 </tr>
                                 {dataPeminjaman.map((item)=>(
-                                    <tr className='grid '>
-                                        <td>{item.ruang}</td>
-                                        <td>{item.peminjam}</td>
-                                        <td>{item.waktu}</td>
-                                        <td><FontAwesomeIcon icon={faEye}/></td>
+                                    <tr key={item.index} >
+                                        <td className='py-2'>{item.ruang}</td>
+                                        <td className='py-2'>{item.peminjam}</td>
+                                        <td className='py-2'>{item.waktu}</td>
+                                        <td className='py-2 text-left'><FontAwesomeIcon icon={faEye} className='fa-lg'/></td>
                                     </tr>
                                 ))}
                             </table>
 						</div>
                     </div>
+                </div>
+                {/* Review Kelas */}
+                <div className='pt-[116px]'>
+                    <Title>Review Kelas</Title>
                 </div>
             </main>
         </div>
