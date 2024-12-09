@@ -15,9 +15,18 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                'sfpromed': ['SFPROMEDIUM', 'roboto', 'sans-serif'],
+                'sfproreg': ['SFPROREGULAR', 'roboto', 'sans-serif'],
+                'sfprobold': ['SFPROBOLD', 'roboto', 'sans-serif']
             },
         },
     },
 
+    daisyui: {
+        themes: [],
+    },
+
     plugins: [require('@tailwindcss/forms'), require('daisyui')],
+
+    
 };
