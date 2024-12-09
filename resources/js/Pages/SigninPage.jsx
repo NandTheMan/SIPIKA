@@ -1,7 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Head, Link } from '@inertiajs/react';
 
 export default function SigninPage(props) {
+    const [date, setDate] = useState(new Date());
+    const onChange = () => {
+        setDate(date);
+    }
     return (
         <div
             className="relative min-h-screen bg-cover bg-center flex items-center justify-center"

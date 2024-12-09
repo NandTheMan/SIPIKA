@@ -20,7 +20,6 @@ export default {
                 'sfprobold': ['SFPROBOLD', 'roboto', 'sans-serif'],
                 philosopher: ['Philosopher', ...defaultTheme.fontFamily.sans],
                 montserrat: ['Montserrat', ...defaultTheme.fontFamily.sans],
-
             },
 
             colors: {
@@ -36,11 +35,10 @@ export default {
         },
     },
 
+
     daisyui: {
         themes: [],
     },
 
     plugins: [require('@tailwindcss/forms'), require('daisyui')],
-
-    
 };
