@@ -22,8 +22,12 @@ Route::get('/signin', function () {
     return Inertia::render('SigninPage');
 });
 
+Route::get('/central', function () {
+    return Inertia::render('dummy');
+});
+
 Route::get('/booking', function () {
-    return Inertia::render('Bookingpage');
+    return Inertia::render('BookingPage');
 });
 
 Route::get('/dashboard', function () {
@@ -39,4 +43,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
