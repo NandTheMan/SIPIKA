@@ -4,7 +4,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use Illuminate\Support\Facades\Hash;
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -12,6 +12,38 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('users')->insert([
+            [
+                'user_id' => '2308561073',
+                'username' => 'admin',
+                'password' => '123',
+                'jabatan' => 'admin',
+                'program_studi' => 'admin',
+                'email' => 'admin@gmail.com',
+                'no_telepon' => '081936052444',
+                'is_penalized' => false
+            ],
+            [
+                'user_id' => '2308561074',
+                'username' => 'koordinator',
+                'password' => Hash::make('4321'),
+                'jabatan' => 'koordinator',
+                'program_studi' => 'Informatika',
+                'email' => 'koordinator@gmail.com',
+                'no_telepon' => '081936052432',
+                'is_penalized' => false
+            ],
+            [
+                'user_id' => '2308561075',
+                'username' => 'dosen',
+                'password' => Hash::make('1234'),
+                'jabatan' => 'dosen',
+                'program_studi' => 'Informatika',
+                'email' => 'dosen@gmail.com',
+                'no_telepon' => '081936052456',
+                'is_penalized' => false
+            ]
+        ]);
         DB::table('classrooms')->insert([
             [
                 'classroom_name' => '1.1',
