@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('dummy');
+    return Inertia::render('SigninPage');
 });
 
 Route::get('/signin', function () {
@@ -22,10 +22,12 @@ Route::get('/booking', function () {
     return Inertia::render('BookingPage');
 });
 
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/regis', function () {
+    return Inertia::render('Register');
+});
 
 Route::get('/classroom', [ClassroomController::class, 'index'])->name('classrooms.index');
 Route::get('/classrooms/create', [ClassroomController::class, 'create'])->name('classrooms.create');
