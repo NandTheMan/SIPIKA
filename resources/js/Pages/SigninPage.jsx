@@ -1,11 +1,47 @@
 import React, {useState} from 'react';
-import { Head, Link } from '@inertiajs/react';
+import {Head, Link, useForm} from '@inertiajs/react';
+import {Inertia} from "@inertiajs/inertia";
+import axios from 'axios';
 
-export default function SigninPage(props) {
-    const [date, setDate] = useState(new Date());
-    const onChange = () => {
-        setDate(date);
+export default function SigninPage() {
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const { data, setData, post, processing, errors, reset } = useForm({
+        email: '',
+        password: '',
+    });
+    const submit = async (e) => {
+        e.preventDefault();
+        console.log('Form submission started.');
+        post(route('login'), {
+            onFinish: () => {
+                console.log('Resetting password field.');
+                reset('password')
+            },
+            onSuccess: async () => {
+                console.log('Login succesful!');
+                Inertia.visit('signin');
+            },
+            onError: (errors) => {
+                console.log('Errors:', errors);
+            },
+        });
+    };
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await axios.post('/login', {email, password});
+            console.log('Login successful:', response.data);
+        } catch (error) {
+          console.error('Login failed:', error.response?.data || error.message)
+            alert('Invalid email or password');
+        }
     }
+
+    const [date, setDate] = useState(new Date());
     return (
         <div
             className="relative min-h-screen bg-cover bg-center flex items-center justify-center"
@@ -24,7 +60,7 @@ export default function SigninPage(props) {
                 className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl px-6 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-8 w-11/12 sm:w-10/12 md:w-full max-w-md
                 translate-x sm:translate-x-[-10%] md:translate-x-[-36%] xl:translate-x-[-52%]"
             >
-                <form>
+                <form onSubmit={submit}>
                     <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2 mt-4 sm:mt-6 text-white">
                         Selamat Datang Kembali
                     </h2>
@@ -44,6 +80,9 @@ export default function SigninPage(props) {
                             className="shadow appearance-none border rounded-full bg-textBoxBlue/45 w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline font-montserrat text-sm"
                             id="email"
                             type="email"
+                            name={"email"}
+                            value={data.email}
+                            onChange={(e) => setData('email', e.target.value)}
                             placeholder="Enter your email"
                         />
                     </div>
@@ -60,6 +99,8 @@ export default function SigninPage(props) {
                             className="shadow appearance-none border rounded-full bg-textBoxBlue/45 w-full py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:shadow-outline font-montserrat text-sm"
                             id="password"
                             type="password"
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
                             placeholder="********"
                         />
 

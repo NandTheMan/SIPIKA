@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             [
                 'user_id' => '2308561073',
                 'username' => 'admin',
-                'password' => '123',
+                'password' => Hash::make('123'),
                 'jabatan' => 'admin',
                 'program_studi' => 'admin',
                 'email' => 'admin@gmail.com',

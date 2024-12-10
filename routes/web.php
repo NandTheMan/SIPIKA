@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('dummy');
+    return Inertia::render('SigninPage');
 });
 
 Route::get('/signin', function () {
