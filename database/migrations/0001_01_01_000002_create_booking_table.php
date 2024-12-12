@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('booking', function (Blueprint $table) {
@@ -18,16 +15,15 @@ return new class extends Migration
             $table->integer('classroom_id')->unsigned();
             $table->foreign('classroom_id')->references('classroom_id')->on('classrooms');
             $table->dateTime('start_time');
-            $table->integer('booking_time');
+            $table->integer('sks_duration'); // Number of SKS units (1 SKS = 40 minutes)
             $table->dateTime('end_time');
-            $table->string('status');
-            $table->string('url_image_start');
-            $table->string('url_image_end');
+            $table->enum('status', ['pending', 'in_progress', 'finished', 'cancelled'])->default('pending');
+            $table->integer('user_size'); // Keep this for manual bookings
+            $table->string('url_image_start')->nullable();
+            $table->string('url_image_end')->nullable();
         });
     }
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('booking');

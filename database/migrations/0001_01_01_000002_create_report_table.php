@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('report', function (Blueprint $table) {
@@ -21,14 +18,12 @@ return new class extends Migration
             $table->foreign('reporter_user_id')->references('user_id')->on('users');
             $table->dateTime('report_time');
             $table->longText('report_description');
-            $table->boolean('report_status');
-            $table->dateTime('report_resolved_time');
+            $table->boolean('report_status')->default(false);
+            $table->dateTime('report_resolved_time')->nullable()->default(null);
             $table->string('url_image_report');
         });
     }
-    /**
-     * Reverse the migrations.
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('report');

@@ -6,19 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->unsignedInteger('user_id')->primary()->autoIncrement();
             $table->string('username');
+            $table->string('email')->unique();
             $table->string('password');
             $table->string('major');
             $table->integer('user_size');
             $table->integer('year');
-            $table->boolean('is_penalized');
+            $table->boolean('is_penalized')->default(false);
+            $table->rememberToken();
         });
 
         Schema::create('roles', function (Blueprint $table) {
@@ -28,15 +27,13 @@ return new class extends Migration
 
         Schema::create('user_roles', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('user_id')->on('users');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->integer('role_id')->unsigned();
-            $table->foreign('role_id')->references('role_id')->on('roles');
+            $table->foreign('role_id')->references('role_id')->on('roles')->onDelete('cascade');
+            $table->primary(['user_id', 'role_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('user_roles');

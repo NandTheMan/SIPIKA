@@ -1,0 +1,240 @@
+/* Calendar Customization */
+.reactCalendar {
+    width: 100% !important;
+    background: white;
+    border: none !important;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 20px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.reactCalendar button {
+    margin: 0;
+    border: 0;
+    outline: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.reactCalendar button:enabled:hover {
+    cursor: pointer;
+    background-color: #e6e6e6;
+}
+
+.reactCalendar button:enabled:active {
+    background-color: #2D3C93;
+    color: white;
+}
+
+/* Navigation arrows */
+.reactCalendar__navigation {
+    display: flex;
+    margin-bottom: 1em;
+}
+
+.reactCalendar__navigation button {
+    min-width: 44px;
+    background: none;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.reactCalendar__navigation button:disabled {
+    background-color: #f0f0f0;
+}
+
+.reactCalendar__navigation button:enabled:hover,
+.reactCalendar__navigation button:enabled:focus {
+    background-color: #e6e6e6;
+}
+
+/* Month view */
+.reactCalendar__month-view__weekdays {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8em;
+    padding: 8px 0;
+}
+
+.reactCalendar__month-view__weekdays__weekday {
+    padding: 0.5em;
+}
+
+.reactCalendar__month-view__days__day {
+    padding: 8px;
+}
+
+.reactCalendar__month-view__days__day--weekend {
+    color: #d10000;
+}
+
+.reactCalendar__month-view__days__day--neighboringMonth {
+    color: #969696;
+}
+
+/* Active date styles */
+.reactCalendar__tile--now {
+    background: #576c9c33 !important;
+    border-radius: 8px;
+}
+
+.reactCalendar__tile--active,
+.reactCalendar__tile--hasActive {
+    background: #2D3C93 !important;
+    color: white !important;
+    border-radius: 8px;
+}
+
+/* DateTime Picker Customization */
+.rdtPicker {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.rdtPicker td.rdtActive,
+.rdtPicker td.rdtActive:hover {
+    background-color: #2D3C93 !important;
+    border-radius: 4px;
+}
+
+.rdtPicker td.rdtToday:before {
+    border-bottom-color: #2D3C93 !important;
+}
+
+.rdtPicker thead tr:first-of-type th:hover {
+    background: #e6e6e6 !important;
+}
+
+/* Room Grid Layout */
+.room-tile {
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.room-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Custom Scrollbar */
+.overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #2D3C93 transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: #2D3C93;
+    border-radius: 20px;
+    border: transparent;
+}
+
+/* Progress Steps Line Animation */
+.step-line {
+    transition: background-color 0.3s ease;
+}
+
+/* Glassmorphism Effects */
+.bg-glassGradient {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    backdrop-filter: blur(10px);
+}
+
+/* Time Selection Input */
+.rdt input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    font-size: 1rem;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+/* Time Selection Container */
+.rdt {
+    position: relative;
+    width: 100%;
+}
+
+.rdtPicker {
+    margin-top: 4px;
+    min-width: 250px;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Table View Enhancements */
+.floor-section {
+    transition: all 0.3s ease;
+}
+
+.floor-section:hover {
+    transform: translateY(-2px);
+}
+
+.rdt input:focus {
+    outline: none;
+    border-color: #2D3C93;
+    box-shadow: 0 0 0 3px rgba(45, 60, 147, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .reactCalendar {
+        padding: 10px;
+    }
+
+    .reactCalendar__navigation button {
+        min-width: 36px;
+        font-size: 14px;
+    }
+
+    .room-tile {
+        padding: 1rem;
+    }
+
+    .rdtPicker {
+        font-size: 14px;
+    }
+}
+
+/* Animation for status messages */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status-message {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid #2D3C93;
+    outline-offset: 2px;
+}
