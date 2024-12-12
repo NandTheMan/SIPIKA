@@ -28,6 +28,17 @@ Route::get('/dashboard', function () {
 Route::get('/regis', function () {
     return Inertia::render('Register');
 });
+Route::get('/laporan', function() {
+    return Inertia::render('Laporanditerima');
+});
+Route::get('/peminjaman', function() {
+    return Inertia::render('Pelaporanpeminjaman');
+});
+Route::get('/konfirmasi', function() {
+    return Inertia::render('Konfirmasi');
+});
+
+
 
 Route::get('/classroom', [ClassroomController::class, 'index'])->name('classrooms.index');
 Route::get('/classrooms/create', [ClassroomController::class, 'create'])->name('classrooms.create');
