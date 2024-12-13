@@ -65,6 +65,7 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
     const [date, setDate] = useState(new Date());
     const [selectedFloor, setSelectedFloor] = useState(null);
     const [dateBookings, setDateBookings] = useState(bookingData);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleDateChange = (newDate) => {
         setDate(newDate);
@@ -72,15 +73,25 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
     };
 
     const fetchBookingsForDate = async (selectedDate) => {
+        setIsLoading(true);
         try {
+            // Adjust the date to local timezone to prevent offset
+            const localDate = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000))
+                .toISOString()
+                .split('T')[0];
+
             const response = await axios.get('/api/bookings', {
                 params: {
-                    date: selectedDate.toISOString().split('T')[0]
+                    date: localDate
                 }
             });
             setDateBookings(response.data);
         } catch (error) {
             console.error('Error fetching bookings:', error);
+            // Show error message to user
+            alert('Failed to fetch bookings. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -224,7 +235,17 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                                         </tr>
                                         </thead>
                                         <tbody className='divide-y divide-gray-200'>
-                                        {dateBookings.length > 0 ? (
+                                        {isLoading ? (
+                                            <tr>
+                                                <td colSpan="4" className="text-center py-4">
+                                                    <div className="flex items-center justify-center">
+                                                        <div
+                                                            className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                                        <span className="ml-2">Loading...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : dateBookings.length > 0 ? (
                                             dateBookings.map((item) => (
                                                 <tr key={item.id}
                                                     className="hover:bg-gray-100 transition-colors even:bg-gray-50">

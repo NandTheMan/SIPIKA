@@ -8,6 +8,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomBookingController;
+use App\Http\Controllers\BookingApiController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
