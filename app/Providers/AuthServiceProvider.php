@@ -2,23 +2,29 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider; // Import the correct base class
+use App\Models\Booking;
+use App\Policies\BookingPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
+     * The policy mappings for the application.
+     *
+     * @var array
      */
-    public function register(): void
-    {
-        //
-    }
+    protected $policies = [
+        Booking::class => BookingPolicy::class,
+    ];
 
     /**
-     * Bootstrap services.
+     * Register any authentication / authorization services.
+     *
+     * @return void
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        // No need to call registerPolicies() anymore.
+        // Laravel will automatically register the policies defined in $policies.
     }
 }

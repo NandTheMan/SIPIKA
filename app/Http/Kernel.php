@@ -47,6 +47,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'booking.time' => \App\Http\Middleware\ValidateBookingTime::class,
+        'validate.session' => \App\Http\Middleware\ValidateSession::class,
     ];
 
     // Remove the $routeMiddleware property entirely

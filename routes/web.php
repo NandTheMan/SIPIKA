@@ -29,7 +29,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Protected Routes (for authenticated users only)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () { // Added 'verified' middleware
     // Home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -60,9 +60,12 @@ Route::middleware('auth')->group(function () {
 
         // API endpoints for React components
         Route::prefix('api')->group(function () {
-            Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']);
-            Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability']);
-            Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor']);
+            Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails'])
+                ->middleware('throttle:60,1'); // Rate limiting
+            Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability'])
+                ->middleware(['throttle:60,1', 'csrf']); // Add CSRF protection
+            Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor'])
+                ->middleware('throttle:60,1');
         });
     });
 

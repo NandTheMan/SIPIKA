@@ -196,6 +196,9 @@ class BookingController extends Controller
 
     public function endEarly(Request $request, Booking $booking)
     {
+        // Check if user is authorized to end this booking
+        $this->authorize('endEarly', $booking);
+
         if ($booking->status !== 'in_progress') {
             return back()->withErrors(['error' => 'Only in-progress bookings can be ended early.']);
         }
@@ -236,8 +239,8 @@ class BookingController extends Controller
 
     public function show(Booking $booking)
     {
-        // Check and cancel overdue bookings before showing details
-        $this->checkAndCancelOverdueBookings();
+        // Check if user is authorized to view this booking
+        $this->authorize('view', $booking);
 
         return view('bookings.show', [
             'booking' => $booking->load(['classroom.facilities', 'user'])
@@ -277,7 +280,9 @@ class BookingController extends Controller
 
     public function cancel(Booking $booking)
     {
-        // Check if booking can be cancelled
+        // Check if user is authorized to cancel this booking
+        $this->authorize('update', $booking);
+
         if (in_array($booking->status, ['in_progress', 'finished'])) {
             return back()->withErrors(['error' => 'Cannot cancel a booking that is in progress or finished.']);
         }
@@ -290,7 +295,7 @@ class BookingController extends Controller
             return redirect()->route('bookings.index')
                 ->with('success', 'Booking cancelled successfully');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to cancel booking. ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to cancel booking: ' . $e->getMessage()]);
         }
     }
 

@@ -156,6 +156,9 @@ class RoomBookingController extends Controller
 
     public function showCheckOut(Booking $booking)
     {
+        // Check if user is authorized to view checkout page
+        $this->authorize('update', $booking);
+
         if ($booking->status !== 'in_progress') {
             return redirect()->route('bookings.show', $booking)
                 ->withErrors(['error' => 'This booking cannot be checked out.']);
@@ -182,6 +185,9 @@ class RoomBookingController extends Controller
 
     public function processCheckOut(Request $request, Booking $booking)
     {
+        // Check if user is authorized to check out this booking
+        $this->authorize('update', $booking);
+
         if ($booking->status !== 'in_progress') {
             return back()->withErrors(['error' => 'This booking cannot be checked out.']);
         }
@@ -206,6 +212,7 @@ class RoomBookingController extends Controller
             return back()->withErrors(['error' => 'Failed to process check-out: ' . $e->getMessage()]);
         }
     }
+
     public function showCheckIn(Booking $booking)
     {
         $now = Carbon::now('Asia/Singapore');
