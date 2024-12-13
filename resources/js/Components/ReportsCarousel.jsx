@@ -31,7 +31,7 @@ const ReportsCarousel = ({ reports }) => {
     return (
         <div className="py-16">
             <div className="container mx-auto px-4">
-                <h2 className="text-4xl font-extrabold text-center text-blue-900 mb-12">Recent Reports</h2>
+                <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Recent Reports</h2>
                 <div className="relative">
                     {/* Carousel Navigation */}
                     <button

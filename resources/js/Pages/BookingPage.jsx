@@ -275,7 +275,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                             <button
                                 onClick={() => setViewAll(!viewAll)}
                                 className={`w-full ${
-                                    viewAll ? "bg-red-600 hover:bg-red-700" : "bg-textBoxBlue hover:bg-buttonBlue"
+                                    viewAll ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-800"
                                 } justify-center align-middle text-white font-bold py-6 px-6 rounded-full focus:outline-none focus:shadow-outline font-montserrat text-center`}
                             >
                                 {viewAll ? "Kembali" : "Lihat Detail"}
@@ -356,10 +356,8 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                     </div>
 
                                     <button
-                                        onClick={() => setViewAll(false)}
-                                        className="mt-6 bg-buttonBlue hover:bg-buttonBlueHover text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                                        className="mt-6"
                                     >
-                                        Kembali
                                     </button>
                                 </div>
                             ) : (
