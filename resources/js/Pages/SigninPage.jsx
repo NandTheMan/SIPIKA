@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function SigninPage({ errors }) {
     const { data, setData, post, processing } = useForm({
@@ -109,12 +109,12 @@ export default function SigninPage({ errors }) {
                 {/* Footer */}
                 <p className="text-center text-white text-xs font-montserrat mt-6 mb-3">
                     Belum memiliki akun?{" "}
-                    <a
-                        href="#"
+                    <Link
+                        href="/register"
                         className="text-gray-300 hover:text-white hover:font-bold"
                     >
-                        Hubungi Admin
-                    </a>
+                        Daftar Sekarang
+                    </Link>
                 </p>
             </div>
         </div>
