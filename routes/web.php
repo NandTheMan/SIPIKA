@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/api/bookings', [BookingApiController::class, 'getBookingsByDate']);
+
     // New React-based Booking System
     Route::prefix('book-room')->group(function () {
         Route::get('/', [RoomBookingController::class, 'index'])->name('booking.index');

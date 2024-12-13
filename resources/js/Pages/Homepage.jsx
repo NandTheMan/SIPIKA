@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEye } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faClock, faGauge, faMagnifyingGlass, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
-// FloorView Component
 function FloorView({ floorNumber, classrooms, onClose }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -62,13 +61,28 @@ function FloorView({ floorNumber, classrooms, onClose }) {
     );
 }
 
-export default function Homepage({ bookingData = [], reportData = [], userName, userMajor, classroomsByFloor = {} }) {
+export default function Homepage({ bookingData = [], reportData = [], userName, userMajor, classroomsByFloor = {}, canBookRoom }) {
     const [date, setDate] = useState(new Date());
     const [selectedFloor, setSelectedFloor] = useState(null);
+    const [dateBookings, setDateBookings] = useState(bookingData);
 
-    const onChange = (newDate) => {
+    const handleDateChange = (newDate) => {
         setDate(newDate);
-    }
+        fetchBookingsForDate(newDate);
+    };
+
+    const fetchBookingsForDate = async (selectedDate) => {
+        try {
+            const response = await axios.get('/api/bookings', {
+                params: {
+                    date: selectedDate.toISOString().split('T')[0]
+                }
+            });
+            setDateBookings(response.data);
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+        }
+    };
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -99,17 +113,20 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                 </div>
             </header>
 
-            <main className='px-[52px] py-[116px] bg-gradient-to-br from-white via-[#CCE0FF] via-[#EBF3FF] to-[#C8DEFF] min-h-screen'>
+            <main
+                className='px-[52px] py-[116px] bg-gradient-to-br from-white via-[#CCE0FF] via-[#EBF3FF] to-[#C8DEFF] min-h-screen'>
                 {/* Pinjam Kelas */}
                 <div>
                     <div>
                         <h1 className="text-4xl font-bold mb-4">Pinjam Kelas</h1>
-                        <p className='w-[554px] font-sfproreg py-3'>Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana</p>
+                        <p className='w-[554px] font-sfproreg py-3'>Platform peminjaman ruangan Gedung Dekanat Fakultas
+                            Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana</p>
                         <Link
                             href="/book-room"
                             className='border-[2px] border-[#2D3C93] w-fit flex items-center gap-2 rounded-lg p-2.5 hover:bg-[#2D3C93] hover:text-white group transition-colors'
                         >
-                            <FontAwesomeIcon icon={faClock} className="group-hover:text-white" style={{color: "#2D3C93"}}/>
+                            <FontAwesomeIcon icon={faClock} className="group-hover:text-white"
+                                             style={{color: "#2D3C93"}}/>
                             <span className='text-[#2D3C93] font-sfpromed group-hover:text-white'>Lihat Kelas</span>
                         </Link>
                     </div>
@@ -172,23 +189,31 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                     </div>
                 </div>
 
-                {/* Lihat Jadwal */}
                 <div className='pt-[116px]'>
                     <h2 className="text-3xl font-bold mb-8">Lihat Jadwal</h2>
                     <div className='pt-[36px] flex items-start gap-8 justify-center'>
                         <div className="w-[400px] bg-white rounded-lg shadow-lg p-3 my-custom-calendar">
                             <Calendar
-                                onChange={onChange}
+                                onChange={handleDateChange}
                                 value={date}
                                 className="w-full"
-                                minDate={new Date()} // Disable past dates
+                                minDate={new Date()}
                             />
                         </div>
-                        {/* Improved Booking Table Section */}
+
+                        {/* Bookings Table */}
                         <div className='flex-1'>
                             <div className='bg-white p-5 rounded-xl shadow-lg'>
-                                <h3 className="text-xl font-semibold mb-4 text-[#2D3C93]">Daftar Peminjaman Hari Ini</h3>
-                                <div className='border border-gray-200 rounded-lg shadow-md overflow-auto max-h-[350px]'>
+                                <h3 className="text-xl font-semibold mb-4 text-[#2D3C93]">
+                                    Daftar Peminjaman {date.toLocaleDateString('id-ID', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                                </h3>
+                                <div
+                                    className='border border-gray-200 rounded-lg shadow-md overflow-auto max-h-[350px]'>
                                     <table className='w-full table-auto border-collapse'>
                                         <thead className='bg-[#2D3C93] text-white'>
                                         <tr>
@@ -199,22 +224,31 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                                         </tr>
                                         </thead>
                                         <tbody className='divide-y divide-gray-200'>
-                                        {bookingData.map((item, index) => (
-                                            <tr key={item.id} className={`hover:bg-gray-100 transition-colors even:bg-gray-50`}>
-                                                <td className='py-2 px-4 whitespace-nowrap'>{item.ruang}</td>
-                                                <td className='py-2 px-4 whitespace-nowrap'>{item.peminjam}</td>
-                                                <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
-                                                <td className='py-2 px-4 whitespace-nowrap text-center'>
-                                                    <Link
-                                                        href={`/bookings/${item.id}`}
-                                                        className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors'
-                                                    >
-                                                        <FontAwesomeIcon icon={faEye} className='fa-sm'/>
-                                                        <span>Lihat</span>
-                                                    </Link>
+                                        {dateBookings.length > 0 ? (
+                                            dateBookings.map((item) => (
+                                                <tr key={item.id}
+                                                    className="hover:bg-gray-100 transition-colors even:bg-gray-50">
+                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.ruang}</td>
+                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.peminjam}</td>
+                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
+                                                    <td className='py-2 px-4 whitespace-nowrap text-center'>
+                                                        <Link
+                                                            href={`/bookings/${item.id}`}
+                                                            className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors'
+                                                        >
+                                                            <FontAwesomeIcon icon={faEye} className='fa-sm'/>
+                                                            <span>Lihat</span>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" className="text-center py-4 text-gray-500">
+                                                    Tidak ada peminjaman untuk tanggal ini
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -222,57 +256,34 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                         </div>
                     </div>
                 </div>
-
-                {/* Laporan Kelas */}
-                <div className='pt-[116px]'>
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-3xl font-bold">Laporan Kelas</h2>
-                        <Link
-                            href="/reports"
-                            className="text-[#2D3C93] hover:text-[#1e2a6a] font-semibold"
-                        >
-                            Lihat Semua
-                        </Link>
-                    </div>
-                    <div className='flex gap-5 pt-[36px] flex-wrap'>
-                        {reportData.map((item)=>(
-                            <div key={item.id} className="bg-white p-6 rounded-3xl shadow-xl w-[512px] hover:shadow-2xl transition-shadow">
-                                <div>
-                                    <h3 className="text-lg font-sfprobold">{item.nama}</h3>
-                                    <p className="font-sfproreg">{item.ruang}</p>
-                                </div>
-                                <p className="mt-4">{item.deskripsi}</p>
-                                {item.status && (
-                                    <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                                        Resolved
-                                    </span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </main>
 
             <footer className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] text-white p-[54px] flex'>
                 <div className='flex-1'>
                     <img src="/images/logo.png" alt="logo-sipika" width={291} className='mb-[38px]'/>
-                    <p>Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana</p>
+                    <p>Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam,
+                        Universitas Udayana</p>
                 </div>
                 <div className='mx-10 w-fit mr-20'>
                     <h4 className='font-sfprobold mb-3'>Quick Links</h4>
                     <div className='flex flex-col gap-1'>
                         <Link href="/" className="hover:text-gray-200 transition-colors">Home</Link>
-                        <Link href="/bookings/create" className="hover:text-gray-200 transition-colors">Pinjam Kelas</Link>
+                        <Link href="/bookings/create" className="hover:text-gray-200 transition-colors">Pinjam
+                            Kelas</Link>
                         <Link href="/classrooms" className="hover:text-gray-200 transition-colors">Lihat Kelas</Link>
-                        <Link href="/reports/create" className="hover:text-gray-200 transition-colors">Lapor Kelas</Link>
+                        <Link href="/reports/create" className="hover:text-gray-200 transition-colors">Lapor
+                            Kelas</Link>
                     </div>
                 </div>
                 <div className='flex-1 space-y-10'>
                     <div>
                         <h4 className='font-sfprobold mb-3'>Further Information</h4>
                         <div className='border rounded-lg flex'>
-                            <input type="text" className='bg-[#0000000A] border-none p-4 flex-1' placeholder="Enter Email"/>
-                            <button type='submit' className='w-fit bg-white text-black rounded-r-lg px-8 font-sfprobold'>Submit</button>
+                            <input type="text" className='bg-[#0000000A] border-none p-4 flex-1'
+                                   placeholder="Enter Email"/>
+                            <button type='submit'
+                                    className='w-fit bg-white text-black rounded-r-lg px-8 font-sfprobold'>Submit
+                            </button>
                         </div>
                     </div>
                     <p>Copyright © all right reserved</p>
