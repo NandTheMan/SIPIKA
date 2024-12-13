@@ -307,7 +307,7 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                             </button>
                         </div>
                     </div>
-                    <p>Copyright © all right reserved</p>
+                    <p>Copyright© SIPIKA. All Rights Reserved</p>
                 </div>
             </footer>
 
