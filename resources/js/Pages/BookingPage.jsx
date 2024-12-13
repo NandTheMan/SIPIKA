@@ -278,7 +278,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                     viewAll ? "bg-red-600 hover:bg-red-700" : "bg-textBoxBlue hover:bg-buttonBlue"
                                 } justify-center align-middle text-white font-bold py-6 px-6 rounded-full focus:outline-none focus:shadow-outline font-montserrat text-center`}
                             >
-                                {viewAll ? "Kembali" : "Lihat Semua"}
+                                {viewAll ? "Kembali" : "Lihat Detail"}
                             </button>
                         </div>
 
@@ -308,59 +308,59 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                     <div className="flex flex-col gap-6 w-full h-[98%] px-1 py-1">
                         <div className="bg-glassGradient backdrop-blur-xl shadow-lg rounded-3xl p-6 overflow-y-auto flex-grow">
                             {viewAll ? (
-                                <div className="bg-white rounded-lg shadow-lg w-full h-full">
-                                    <div className="space-y-6 p-6">
+                                <div className="bg-white rounded-xl shadow-lg p-6 w-full h-full">
+                                    <div className="space-y-6">
                                         {Object.entries(classroomsByFloor).map(([floor, rooms]) => (
                                             <div key={floor} className="bg-gray-50 rounded-lg p-4">
-                                                <h3 className="text-lg font-semibold mb-4 text-gray-700">Lantai {floor}</h3>
-                                                <div className="bg-white rounded-lg shadow">
-                                                    <table className="table-auto w-full text-left">
-                                                        <thead className="bg-gray-100">
-                                                        <tr>
-                                                            <th className="px-6 py-3 font-bold text-gray-700">Room Name</th>
-                                                            <th className="px-6 py-3 font-bold text-gray-700">Capacity</th>
-                                                            <th className="px-6 py-3 font-bold text-gray-700">Facilities</th>
-                                                            <th className="px-6 py-3 font-bold text-gray-700">Status</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {rooms.map((room) => (
-                                                            <tr
-                                                                key={room.id}
-                                                                className="border-t cursor-pointer hover:bg-gray-50 transition-colors"
-                                                                onClick={() => handleRoomSelect(room.id)}
-                                                            >
-                                                                <td className="px-6 py-3 text-gray-600">{room.name}</td>
-                                                                <td className="px-6 py-3 text-gray-600">{room.capacity} orang</td>
-                                                                <td className="px-6 py-3">
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {room.facilities.map((facility, idx) => (
-                                                                            <span
-                                                                                key={idx}
-                                                                                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                                                                            >
-                                                                                    {facility}
-                                                                                </span>
-                                                                        ))}
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-3">
-                                                                        <span className={`px-2 py-1 rounded text-sm ${
-                                                                            room.isBooked
-                                                                                ? 'bg-red-100 text-red-800'
-                                                                                : 'bg-green-100 text-green-800'
-                                                                        }`}>
-                                                                            {room.isBooked ? 'Terpakai' : 'Tersedia'}
-                                                                        </span>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                        </tbody>
-                                                    </table>
+                                                <h3 className="text-lg font-semibold mb-4 text-[#2D3C93]">Lantai {floor}</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {rooms.map((room) => (
+                                                        <div
+                                                            key={room.id}
+                                                            onClick={() => handleRoomSelect(room.id)}
+                                                            className={`bg-white rounded-lg p-4 shadow-md border transition-all duration-200 hover:shadow-lg cursor-pointer
+                                    ${selectedRoom === room.id ? 'border-buttonBlue' : 'border-transparent'}`}
+                                                        >
+                                                            <div className="flex justify-between items-start">
+                                                                <div>
+                                                                    <h4 className="font-bold text-gray-800">{room.name}</h4>
+                                                                    <p className="text-sm text-gray-600">Kapasitas: {room.capacity} orang</p>
+                                                                </div>
+                                                                <span className={`px-2 py-1 text-xs rounded-full ${
+                                                                    room.isBooked
+                                                                        ? 'bg-red-100 text-red-800'
+                                                                        : 'bg-green-100 text-green-800'
+                                                                }`}>
+                                        {room.isBooked ? 'Terpakai' : 'Tersedia'}
+                                    </span>
+                                                            </div>
+
+                                                            <div className="mt-3">
+                                                                <p className="text-sm font-medium text-gray-600">Fasilitas:</p>
+                                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                                    {room.facilities.map((facility, idx) => (
+                                                                        <span
+                                                                            key={idx}
+                                                                            className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                                                                        >
+                                                {facility}
+                                            </span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
+
+                                    <button
+                                        onClick={() => setViewAll(false)}
+                                        className="mt-6 bg-buttonBlue hover:bg-buttonBlueHover text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                                    >
+                                        Kembali
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-6">

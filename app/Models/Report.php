@@ -10,9 +10,9 @@ class Report extends Model
     protected $table = 'report';
 
     public $timestamps = false;
-    
+
     protected $primaryKey = 'report_id';
-    
+
     protected $fillable = [
         'reported_user_id',
         'classroom_id',

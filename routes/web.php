@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReactReportController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomBookingController;
@@ -29,7 +30,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Protected Routes (for authenticated users only)
-Route::middleware(['auth', 'verified'])->group(function () { // Added 'verified' middleware
+Route::middleware(['auth', 'verified'])->group(function () {
     // Home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -61,9 +62,9 @@ Route::middleware(['auth', 'verified'])->group(function () { // Added 'verified'
         // API endpoints for React components
         Route::prefix('api')->group(function () {
             Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails'])
-                ->middleware('throttle:60,1'); // Rate limiting
+                ->middleware('throttle:60,1');
             Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability'])
-                ->middleware(['throttle:60,1', 'csrf']); // Add CSRF protection
+                ->middleware(['throttle:60,1', 'csrf']);
             Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor'])
                 ->middleware('throttle:60,1');
         });
@@ -99,12 +100,26 @@ Route::middleware(['auth', 'verified'])->group(function () { // Added 'verified'
         Route::put('/{booking}/end-early', [BookingController::class, 'endEarly'])->name('bookings.end-early');
     });
 
-    // Reports
+    // Legacy Reports (Admin Only)
+    Route::middleware('admin')->prefix('admin/reports')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('admin.reports.index');
+        Route::get('/create', [ReportController::class, 'create'])->name('admin.reports.create');
+        Route::post('/', [ReportController::class, 'store'])->name('admin.reports.store');
+        Route::get('/{report}', [ReportController::class, 'show'])->name('admin.reports.show');
+        Route::put('/{report}', [ReportController::class, 'update'])->name('admin.reports.update');
+    });
+
+    // New React-based Reports (Regular Users)
     Route::prefix('reports')->group(function () {
-        Route::get('/', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/create', [ReportController::class, 'create'])->name('reports.create');
-        Route::post('/', [ReportController::class, 'store'])->name('reports.store');
-        Route::get('/{report}', [ReportController::class, 'show'])->name('reports.show');
-        Route::put('/{report}', [ReportController::class, 'update'])->name('reports.update');
+        Route::get('/', [ReactReportController::class, 'index'])->name('reports.index');
+        Route::get('/create', [ReactReportController::class, 'create'])->name('reports.create');
+        Route::post('/', [ReactReportController::class, 'store'])->name('reports.store');
+        Route::get('/{report}', [ReactReportController::class, 'show'])->name('reports.show');
+
+        // API endpoints for React components
+        Route::prefix('api')->group(function () {
+            Route::get('/classrooms', [ReactReportController::class, 'getClassrooms'])
+                ->middleware('throttle:60,1');
+        });
     });
 });

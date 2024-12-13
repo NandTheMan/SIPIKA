@@ -31,17 +31,22 @@ class HomeController extends Controller
             });
 
         // Get recent reports
-        $recentReports = Report::with(['reportedUser', 'classroom'])
+        $recentReports = Report::with(['reportedUser', 'reporterUser', 'classroom'])
             ->orderBy('report_time', 'desc')
-            ->take(4)
+            ->take(6)  // Get more reports for the carousel
             ->get()
             ->map(function ($report) {
                 return [
                     'id' => $report->report_id,
-                    'nama' => $report->reportedUser->username,
-                    'ruang' => $report->classroom->classroom_name,
-                    'deskripsi' => $report->report_description,
-                    'status' => $report->report_status
+                    'reportedBy' => $report->reporterUser->username,
+                    'reportedByMajor' => $report->reporterUser->major,
+                    'reportedUser' => $report->reportedUser->username,
+                    'reportedUserMajor' => $report->reportedUser->major,
+                    'classroom' => $report->classroom->classroom_name,
+                    'time' => $report->report_time->format('d M Y, H:i'),
+                    'description' => $report->report_description,
+                    'status' => $report->report_status,
+                    'image' => $report->url_image_report
                 ];
             });
 
@@ -76,11 +81,11 @@ class HomeController extends Controller
 
         return Inertia::render('Homepage', [
             'bookingData' => $todayBookings,
-            'reportData' => $recentReports,
+            'reportData' => $recentReports, // Pass the reports data
             'userName' => $currentUser->username,
             'userMajor' => $currentUser->major,
             'classroomsByFloor' => $classroomsByFloor,
-            'canBookRoom' => !$currentUser->is_penalized, // Add booking permission check
+            'canBookRoom' => !$currentUser->is_penalized,
         ]);
     }
 
