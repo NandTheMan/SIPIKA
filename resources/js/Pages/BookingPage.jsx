@@ -70,10 +70,12 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         if (!selectedTime) return;
 
         const timeString = moment(selectedTime).format('HH:mm');
-        axios.post('/booking/check-availability', {
+        const dateString = moment(selectedDate).format('YYYY-MM-DD');
+
+        axios.post('/book-room/api/check-availability', {
             roomId: selectedRoom,
-            date: moment(selectedDate).format('YYYY-MM-DD'),
-            time: timeString
+            date: dateString,
+            time: timeString,
         }).then(response => {
             setIsAvailable(response.data.isAvailable);
         }).catch(error => {
@@ -103,30 +105,23 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     };
 
     const handleNextClick = () => {
-        if (!isAvailable) {
-            alert('The selected room is not available at the chosen time.');
+        if (!isAvailable || !selectedRoom || !selectedTime) {
+            alert('Please select a room and time first');
             return;
         }
 
-        if (!selectedTime) {
-            alert('Please select a time for your booking.');
-            return;
-        }
-
-        axios.post('/booking/create', {
-            roomId: selectedRoom,
-            date: moment(selectedDate).format('YYYY-MM-DD'),
-            startTime: moment(selectedTime).format('HH:mm'),
-            duration: 2 // Default to 2 SKS
-        }).then(response => {
-            if (response.data.success) {
-                router.visit(response.data.redirect);
-            }
-        }).catch(error => {
-            console.error('Error creating booking:', error);
-            alert('Failed to create booking. Please try again.');
+        router.visit('/book-room/details', {
+            method: 'get',
+            data: {
+                roomId: selectedRoom,
+                date: moment(selectedDate).format('YYYY-MM-DD'),
+                startTime: moment(selectedTime).format('HH:mm'),
+            },
+            preserveState: true,
+            preserveScroll: true,
         });
     };
+
 
     return (
         <div className="h-screen">
@@ -194,13 +189,13 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                     key={floor}
                                     onClick={() => handleFloorChange(floor)}
                                     disabled={viewAll}
-                                    className={`w-full ${
+                                    className={`floor-button ${
                                         viewAll
                                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                             : currentFloor === floor
                                                 ? "bg-buttonBlueHover"
                                                 : "bg-buttonBlue hover:bg-buttonBlueHover"
-                                    } text-white font-bold py-6 px-6 rounded-full focus:outline-none focus:shadow-outline font-montserrat text-left pl-4`}
+                                    }`}
                                 >
                                     Lantai {floor}
                                 </button>
@@ -219,8 +214,23 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                         <Calendar
                             onChange={handleDateChange}
                             value={selectedDate}
-                            className="reactCalendar overflow-hidden"
+                            className="react-calendar"
                             minDate={new Date()}
+                            view="month"
+                            formatMonthYear={(locale, date) => {
+                                const month = date.toLocaleString('default', { month: 'long' });
+                                const year = date.getFullYear();
+                                return `${month} ${year}`;
+                            }}
+                            navigationLabel={({ date, label, locale, view }) => {
+                                const month = date.toLocaleString('default', { month: 'long' });
+                                const year = date.getFullYear();
+                                return `${month} ${year}`;
+                            }}
+                            tileContent={({ date, view }) => {
+                                // Add custom content to tiles if needed
+                                return null;
+                            }}
                         />
                     </div>
 

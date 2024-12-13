@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEye } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faClock, faGauge, faMagnifyingGlass, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
-// FloorView Component (internal to keep things working for now)
+// FloorView Component
 function FloorView({ floorNumber, classrooms, onClose }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -66,8 +66,8 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
     const [date, setDate] = useState(new Date());
     const [selectedFloor, setSelectedFloor] = useState(null);
 
-    const onChange = () => {
-        setDate(date);
+    const onChange = (newDate) => {
+        setDate(newDate);
     }
 
     const handleLogout = (e) => {
@@ -175,37 +175,50 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                 {/* Lihat Jadwal */}
                 <div className='pt-[116px]'>
                     <h2 className="text-3xl font-bold mb-8">Lihat Jadwal</h2>
-                    <div className='pt-[36px] flex items-center gap-5 justify-center'>
-                        <Calendar onChange={onChange} value={date} className="p-4 bg-white rounded-lg shadow-lg"/>
-                        <div className='flex-1 bg-white p-5 rounded-xl shadow-lg ml-20 h-[350px] overflow-auto'>
-                            <table className='w-full table-auto table-fixed border-collapse text-center'>
-                                <thead>
-                                <tr>
-                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Ruang</th>
-                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Peminjam</th>
-                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93]'>Waktu</th>
-                                    <th className='pb-2 text-lg font-sfprobold text-[#2D3C93] w-[16%]'></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {bookingData.map((item)=>(
-                                    <tr key={item.id}>
-                                        <td className='py-2'>{item.ruang}</td>
-                                        <td className='py-2'>{item.peminjam}</td>
-                                        <td className='py-2'>{item.waktu}</td>
-                                        <td className='py-2'>
-                                            <Link
-                                                href={`/bookings/${item.id}`}
-                                                className='flex items-center gap-2 bg-[#2D3C93] text-white justify-center mx-2 py-1 rounded-lg hover:bg-[#1e2a6a] transition-colors'
-                                            >
-                                                <FontAwesomeIcon icon={faEye} className='fa-sm'/>
-                                                <span>Lihat</span>
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                    <div className='pt-[36px] flex items-start gap-8 justify-center'>
+                        <div className="w-[400px] bg-white rounded-lg shadow-lg p-3 my-custom-calendar">
+                            <Calendar
+                                onChange={onChange}
+                                value={date}
+                                className="w-full"
+                                minDate={new Date()} // Disable past dates
+                            />
+                        </div>
+                        {/* Improved Booking Table Section */}
+                        <div className='flex-1'>
+                            <div className='bg-white p-5 rounded-xl shadow-lg'>
+                                <h3 className="text-xl font-semibold mb-4 text-[#2D3C93]">Daftar Peminjaman Hari Ini</h3>
+                                <div className='border border-gray-200 rounded-lg shadow-md overflow-auto max-h-[350px]'>
+                                    <table className='w-full table-auto border-collapse'>
+                                        <thead className='bg-[#2D3C93] text-white'>
+                                        <tr>
+                                            <th className='py-3 px-4 text-left font-semibold'>Ruang</th>
+                                            <th className='py-3 px-4 text-left font-semibold'>Peminjam</th>
+                                            <th className='py-3 px-4 text-left font-semibold'>Waktu</th>
+                                            <th className='py-3 px-4 font-semibold text-center w-[16%]'>Aksi</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className='divide-y divide-gray-200'>
+                                        {bookingData.map((item, index) => (
+                                            <tr key={item.id} className={`hover:bg-gray-100 transition-colors even:bg-gray-50`}>
+                                                <td className='py-2 px-4 whitespace-nowrap'>{item.ruang}</td>
+                                                <td className='py-2 px-4 whitespace-nowrap'>{item.peminjam}</td>
+                                                <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
+                                                <td className='py-2 px-4 whitespace-nowrap text-center'>
+                                                    <Link
+                                                        href={`/bookings/${item.id}`}
+                                                        className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors'
+                                                    >
+                                                        <FontAwesomeIcon icon={faEye} className='fa-sm'/>
+                                                        <span>Lihat</span>
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -225,10 +238,8 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                         {reportData.map((item)=>(
                             <div key={item.id} className="bg-white p-6 rounded-3xl shadow-xl w-[512px] hover:shadow-2xl transition-shadow">
                                 <div>
-                                    <div>
-                                        <h3 className="text-lg font-sfprobold">{item.nama}</h3>
-                                        <p className="font-sfproreg">{item.ruang}</p>
-                                    </div>
+                                    <h3 className="text-lg font-sfprobold">{item.nama}</h3>
+                                    <p className="font-sfproreg">{item.ruang}</p>
                                 </div>
                                 <p className="mt-4">{item.deskripsi}</p>
                                 {item.status && (
@@ -264,9 +275,32 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                             <button type='submit' className='w-fit bg-white text-black rounded-r-lg px-8 font-sfprobold'>Submit</button>
                         </div>
                     </div>
-                    <p>Copyright © all right reserve</p>
+                    <p>Copyright © all right reserved</p>
                 </div>
             </footer>
+
+            {/* Custom Styles */}
+            <style>
+                {`
+                /* Increase line spacing and separate month & year lines in the calendar navigation */
+                .my-custom-calendar .react-calendar__navigation__label {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    line-height: 1.5;
+                }
+
+                .my-custom-calendar .react-calendar__navigation__label span {
+                    margin-bottom: 0.5rem; /* Adds space between month and year lines */
+                }
+
+                /* Adjust spacing for weekdays and days to reduce empty space */
+                .my-custom-calendar .react-calendar__month-view__weekdays,
+                .my-custom-calendar .react-calendar__month-view__days {
+                    margin-top: 1rem;
+                }
+            `}
+            </style>
         </div>
     );
 }

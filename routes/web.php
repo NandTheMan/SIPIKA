@@ -38,19 +38,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/book-room', [RoomBookingController::class, 'index'])->name('book-room');
-    Route::get('/api/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']);
-    Route::post('/api/check-availability', [RoomBookingController::class, 'checkAvailability']);
-    Route::get('/api/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor']);
-    Route::post('/booking/create', [RoomBookingController::class, 'createBooking'])->name('booking.create');
-
-    // Room Booking (New React-based booking system)
-    Route::prefix('booking')->group(function () {
+    // New React-based Booking System
+    Route::prefix('book-room')->group(function () {
         Route::get('/', [RoomBookingController::class, 'index'])->name('booking.index');
-        Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']);
-        Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability']);
-        Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor']);
+        Route::get('/details', [RoomBookingController::class, 'showDetails'])->name('booking.details');
         Route::post('/create', [RoomBookingController::class, 'createBooking'])->name('booking.create');
+
+        // API endpoints for React components
+        Route::prefix('api')->group(function () {
+            Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']);
+            Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability']);
+            Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor']);
+        });
     });
 
     // Classrooms
@@ -64,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/facilities', [FacilityController::class, 'index'])->name('facilities.index');
     Route::get('/facilities/{facility}', [FacilityController::class, 'show'])->name('facilities.show');
 
-    // Legacy Booking Routes
+    // Legacy Booking System
     Route::prefix('bookings')->group(function () {
         Route::get('/', [BookingController::class, 'index'])->name('bookings.index');
         Route::get('/select-datetime', [BookingController::class, 'selectDateTime'])->name('bookings.select-datetime');

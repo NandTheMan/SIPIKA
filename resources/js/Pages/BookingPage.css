@@ -1,123 +1,168 @@
-/* Calendar Customization */
-.reactCalendar {
+/* Calendar Container */
+.react-calendar {
     width: 100% !important;
+    min-height: 580px !important;
     background: white;
     border: none !important;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 24px;
     font-family: 'Montserrat', sans-serif;
 }
 
-.reactCalendar button {
-    margin: 0;
-    border: 0;
-    outline: none;
-    border-radius: 8px;
+/* Navigation Bar */
+.react-calendar__navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding: 0 16px;
+}
+
+.react-calendar__navigation button {
+    min-width: 48px;
+    height: 48px;
+    background: none;
+    font-size: 24px;
+    color: #2D3C93;
+    border: none;
+    border-radius: 12px;
     transition: all 0.2s ease;
 }
 
-.reactCalendar button:enabled:hover {
-    cursor: pointer;
-    background-color: #e6e6e6;
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background-color: #f0f4ff;
 }
 
-.reactCalendar button:enabled:active {
-    background-color: #2D3C93;
-    color: white;
+.react-calendar__navigation button[disabled] {
+    background-color: #f5f5f5;
 }
 
-/* Navigation arrows */
-.reactCalendar__navigation {
-    display: flex;
-    margin-bottom: 1em;
+.react-calendar__navigation__label {
+    font-size: 24px !important;
+    font-weight: bold !important;
+    color: #2D3C93 !important;
+    flex-grow: 1;
+    text-align: center;
 }
 
-.reactCalendar__navigation button {
-    min-width: 44px;
-    background: none;
-    font-size: 16px;
-    margin-top: 8px;
+/* Month View */
+.react-calendar__month-view {
+    padding: 0 8px;
 }
 
-.reactCalendar__navigation button:disabled {
-    background-color: #f0f0f0;
-}
-
-.reactCalendar__navigation button:enabled:hover,
-.reactCalendar__navigation button:enabled:focus {
-    background-color: #e6e6e6;
-}
-
-/* Month view */
-.reactCalendar__month-view__weekdays {
+.react-calendar__month-view__weekdays {
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
-    font-size: 0.8em;
-    padding: 8px 0;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
 }
 
-.reactCalendar__month-view__weekdays__weekday {
-    padding: 0.5em;
+.react-calendar__month-view__weekdays__weekday {
+    padding: 12px;
 }
 
-.reactCalendar__month-view__days__day {
-    padding: 8px;
+.react-calendar__month-view__days {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
 }
 
-.reactCalendar__month-view__days__day--weekend {
-    color: #d10000;
+/* Day Tiles */
+.react-calendar__tile {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #edf2f7;
+    background: white;
+    transition: all 0.2s ease;
 }
 
-.reactCalendar__month-view__days__day--neighboringMonth {
-    color: #969696;
+.react-calendar__tile:enabled:hover {
+    background: #f0f4ff;
+    border-color: #2D3C93;
+    color: #2D3C93;
 }
 
-/* Active date styles */
-.reactCalendar__tile--now {
-    background: #576c9c33 !important;
-    border-radius: 8px;
+.react-calendar__tile--now {
+    background: #f0f4ff !important;
+    color: #2D3C93 !important;
 }
 
-.reactCalendar__tile--active,
-.reactCalendar__tile--hasActive {
+.react-calendar__tile--active,
+.react-calendar__tile--hasActive {
     background: #2D3C93 !important;
     color: white !important;
-    border-radius: 8px;
+    border-color: #2D3C93 !important;
 }
 
-/* DateTime Picker Customization */
+.react-calendar__month-view__days__day--neighboringMonth {
+    color: #d1d5db;
+}
+
+.react-calendar__month-view__days__day--weekend {
+    color: #f43f5e;
+}
+
+/* Time Picker Styles */
+.rdt {
+    position: relative;
+    width: 100%;
+}
+
+.rdt input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    font-size: 16px;
+    color: #1f2937;
+    transition: all 0.2s ease;
+}
+
+.rdt input:focus {
+    outline: none;
+    border-color: #2D3C93;
+    box-shadow: 0 0 0 3px rgba(45, 60, 147, 0.1);
+}
+
 .rdtPicker {
+    margin-top: 8px;
+    min-width: 250px;
+    padding: 16px;
     background: white !important;
     border: 1px solid #e5e7eb !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
-.rdtPicker td.rdtActive,
-.rdtPicker td.rdtActive:hover {
-    background-color: #2D3C93 !important;
-    border-radius: 4px;
+/* Room Grid */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+    padding: 24px;
 }
 
-.rdtPicker td.rdtToday:before {
-    border-bottom-color: #2D3C93 !important;
-}
-
-.rdtPicker thead tr:first-of-type th:hover {
-    background: #e6e6e6 !important;
-}
-
-/* Room Grid Layout */
 .room-tile {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    transform: translateY(0);
 }
 
 .room-tile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* Custom Scrollbar */
@@ -137,86 +182,32 @@
 .overflow-y-auto::-webkit-scrollbar-thumb {
     background-color: #2D3C93;
     border-radius: 20px;
-    border: transparent;
 }
 
-/* Progress Steps Line Animation */
-.step-line {
-    transition: background-color 0.3s ease;
-}
-
-/* Glassmorphism Effects */
-.bg-glassGradient {
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(255, 255, 255, 0.1) 100%
-    );
-    backdrop-filter: blur(10px);
-}
-
-/* Time Selection Input */
-.rdt input {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    background-color: white;
-    font-size: 1rem;
-    color: #374151;
-    transition: all 0.2s ease;
-}
-
-/* Time Selection Container */
-.rdt {
-    position: relative;
-    width: 100%;
-}
-
-.rdtPicker {
-    margin-top: 4px;
-    min-width: 250px;
-    padding: 8px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-}
-
-/* Table View Enhancements */
-.floor-section {
-    transition: all 0.3s ease;
-}
-
-.floor-section:hover {
-    transform: translateY(-2px);
-}
-
-.rdt input:focus {
-    outline: none;
-    border-color: #2D3C93;
-    box-shadow: 0 0 0 3px rgba(45, 60, 147, 0.1);
-}
-
-/* Responsive Adjustments */
+/* Media Queries */
 @media (max-width: 768px) {
-    .reactCalendar {
-        padding: 10px;
+    .react-calendar {
+        min-height: 400px !important;
+        padding: 16px;
     }
 
-    .reactCalendar__navigation button {
-        min-width: 36px;
-        font-size: 14px;
+    .react-calendar__navigation button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
 
-    .room-tile {
-        padding: 1rem;
+    .react-calendar__navigation__label {
+        font-size: 20px !important;
     }
 
-    .rdtPicker {
-        font-size: 14px;
+    .react-calendar__tile {
+        font-size: 16px;
+        padding: 12px;
     }
 }
 
-/* Animation for status messages */
+/* Status Message Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -232,9 +223,25 @@
     animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Focus states for accessibility */
-button:focus-visible,
-input:focus-visible {
-    outline: 2px solid #2D3C93;
-    outline-offset: 2px;
+/* Floor Buttons */
+.floor-button {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: #2D3C93;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.floor-button:hover {
+    background: #364a78;
+}
+
+.floor-button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
 }

@@ -16,27 +16,19 @@ class RoomBookingController extends Controller
     {
         $currentUser = auth()->user();
 
-        // Get all classrooms grouped by floor with proper format for React
-        $classrooms = Classroom::with('facilities')
+        $classroomsByFloor = Classroom::with('facilities')
             ->orderBy('floor')
             ->orderBy('classroom_name')
-            ->get();
-
-        $classroomsByFloor = $classrooms->groupBy('floor')
-            ->map(function ($floorClassrooms) {
-                return $floorClassrooms->map(function ($classroom) {
-                    $currentBooking = $this->getCurrentBooking($classroom);
-
+            ->get()
+            ->groupBy('floor')
+            ->map(function ($classrooms) {
+                return $classrooms->map(function ($classroom) {
                     return [
                         'id' => $classroom->classroom_id,
                         'name' => $classroom->classroom_name,
                         'capacity' => $classroom->classroom_capacity,
                         'facilities' => $classroom->facilities->pluck('facility_name'),
-                        'isBooked' => (bool)$currentBooking,
-                        'currentBooking' => $currentBooking ? [
-                            'endTime' => $currentBooking->end_time->format('H:i'),
-                            'userCount' => $currentBooking->user_size
-                        ] : null
+                        'floor' => $classroom->floor
                     ];
                 });
             });
@@ -45,6 +37,38 @@ class RoomBookingController extends Controller
             'userName' => $currentUser->username,
             'userMajor' => $currentUser->major,
             'classroomsByFloor' => $classroomsByFloor
+        ]);
+    }
+
+    public function showDetails(Request $request)
+    {
+        $request->validate([
+            'roomId' => 'required|exists:classrooms,classroom_id',
+            'date' => 'required|date',
+            'startTime' => 'required|date_format:H:i',
+        ]);
+
+        $classroom = Classroom::with('facilities')->findOrFail($request->roomId);
+        $date = Carbon::parse($request->date);
+
+        $bookingData = [
+            'roomId' => $classroom->classroom_id,
+            'roomName' => $classroom->classroom_name,
+            'date' => $request->date,
+            'formattedDate' => $date->isoFormat('dddd, D MMMM Y'),
+            'startTime' => $request->startTime,
+            'capacity' => $classroom->classroom_capacity,
+            'facilities' => $classroom->facilities->pluck('facility_name'),
+        ];
+
+        return Inertia::render('BookingPageDetails', [
+            'bookingData' => $bookingData,
+            'auth' => [
+                'user' => $request->user() ? [
+                    'username' => $request->user()->username,
+                    'major' => $request->user()->major,
+                ] : null,
+            ],
         ]);
     }
 
@@ -74,14 +98,22 @@ class RoomBookingController extends Controller
             'time' => 'required|date_format:H:i'
         ]);
 
-        $dateTime = Carbon::parse($request->date . ' ' . $request->time);
+        $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
+        $endDateTime = SKSHelper::calculateEndTime($startDateTime, 2); // Default to 2 SKS for initial check
 
-        // Check for existing bookings
+        // Check for existing bookings that overlap with the requested time period
         $existingBooking = Booking::where('classroom_id', $request->roomId)
             ->whereIn('status', ['pending', 'in_progress'])
-            ->where(function($query) use ($dateTime) {
-                $query->where('start_time', '<=', $dateTime)
-                    ->where('end_time', '>=', $dateTime);
+            ->where(function($query) use ($startDateTime, $endDateTime) {
+                $query->where(function($q) use ($startDateTime, $endDateTime) {
+                    // Check if the existing booking overlaps with the requested time
+                    $q->whereBetween('start_time', [$startDateTime, $endDateTime])
+                        ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
+                        ->orWhere(function($q) use ($startDateTime, $endDateTime) {
+                            $q->where('start_time', '<=', $startDateTime)
+                                ->where('end_time', '>=', $endDateTime);
+                        });
+                });
             })
             ->exists();
 
