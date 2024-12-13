@@ -223,6 +223,23 @@
     padding: 0.5rem;
 }
 
+.time-picker-custom .rdtPicker td.rdtDisabled,
+.time-picker-custom .rdtPicker td.rdtDisabled:hover {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.time-picker-custom .rdtPicker td.rdtActive {
+    background-color: #2D3C93 !important;
+    color: #fff !important;
+}
+
+.time-picker-custom .rdtPicker td.rdtToday:not(.rdtActive) {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
 /* Room Grid */
 .room-grid {
     display: grid;

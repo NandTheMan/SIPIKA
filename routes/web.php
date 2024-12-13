@@ -41,8 +41,12 @@ Route::middleware('auth')->group(function () {
     // New React-based Booking System
     Route::prefix('book-room')->group(function () {
         Route::get('/', [RoomBookingController::class, 'index'])->name('booking.index');
-        Route::get('/details', [RoomBookingController::class, 'showDetails'])->name('booking.details');
-        Route::post('/create', [RoomBookingController::class, 'createBooking'])->name('booking.create');
+        Route::get('/details', [RoomBookingController::class, 'showDetails'])
+            ->middleware([\App\Http\Middleware\ValidateBookingTime::class])
+            ->name('booking.details');
+        Route::post('/create', [RoomBookingController::class, 'createBooking'])
+            ->middleware([\App\Http\Middleware\ValidateBookingTime::class])
+            ->name('booking.create');
         Route::get('/confirmation/{booking}', [RoomBookingController::class, 'showConfirmation'])->name('booking.confirmation');
         Route::get('/check-in/{booking}', [RoomBookingController::class, 'showCheckIn'])->name('booking.check-in');
         Route::post('/check-in/{booking}', [RoomBookingController::class, 'processCheckIn'])->name('booking.process-check-in');

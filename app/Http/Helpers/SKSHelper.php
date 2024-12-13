@@ -52,4 +52,24 @@ class SKSHelper
 
         return $slots;
     }
+
+    public static function getValidTimeSlots(): array
+    {
+        $slots = [];
+        $now = Carbon::now('Asia/Singapore');
+        $start = $now->copy()->startOfHour();
+        $end = Carbon::createFromTime(17, 0);  // End at 5 PM
+
+        if ($now->minute > 0) {
+            // If we're partway through an hour, start from the next hour
+            $start->addHour();
+        }
+
+        while ($start <= $end) {
+            $slots[] = $start->format('H:i');
+            $start->addMinutes(40); // Add one SKS duration
+        }
+
+        return $slots;
+    }
 }

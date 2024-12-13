@@ -24,9 +24,20 @@ class BookingController extends Controller
 
     public function storeDateTime(Request $request)
     {
+        $now = Carbon::now('Asia/Singapore');
+
         $validated = $request->validate([
             'date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
+            'start_time' => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) use ($request, $now) {
+                    $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+                    if ($selectedDateTime->lt($now)) {
+                        $fail('The selected time must be later than the current time.');
+                    }
+                },
+            ],
             'sks_duration' => 'required|integer|min:1|max:6'
         ]);
 

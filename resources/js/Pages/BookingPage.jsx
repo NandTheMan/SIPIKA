@@ -21,6 +21,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     const [viewAll, setViewAll] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [floors, setFloors] = useState(Object.keys(classroomsByFloor || {}).sort());
+    const [timeError, setTimeError] = useState('');
 
     // Refs for step visualization
     const step1Ref = useRef(null);
@@ -61,9 +62,40 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
 
     // Check availability when room, date, or time changes
     useEffect(() => {
-        if (selectedRoom && selectedDate && selectedTime) {
-            checkAvailability();
-        }
+        const checkAvailability = async () => {
+            if (selectedRoom && selectedDate && selectedTime) {
+                const dateString = moment(selectedDate).format('YYYY-MM-DD');
+                const timeString = moment(selectedTime).format('HH:mm');
+                const selectedDateTime = moment(`${dateString} ${timeString}`);
+                const now = moment();
+
+                // Reset availability status first
+                setIsAvailable(null);
+
+                // Only check availability if selected time is after current time
+                if (selectedDateTime.isAfter(now)) {
+                    try {
+                        const response = await axios.post('/book-room/api/check-availability', {
+                            roomId: selectedRoom,
+                            date: dateString,
+                            time: timeString,
+                        });
+                        console.log('Availability response:', response.data); // Debug log
+                        setIsAvailable(response.data.isAvailable);
+                    } catch (error) {
+                        console.error('Error checking availability:', error);
+                        setIsAvailable(false);
+                    }
+                } else {
+                    setIsAvailable(false);
+                }
+            } else {
+                // Reset availability if any required field is missing
+                setIsAvailable(null);
+            }
+        };
+
+        checkAvailability();
     }, [selectedRoom, selectedDate, selectedTime]);
 
     const checkAvailability = () => {
@@ -94,7 +126,23 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     };
 
     const handleTimeChange = (time) => {
+        const selectedDateTime = moment(selectedDate).set({
+            hour: time.hour(),
+            minute: time.minute()
+        });
+        const now = moment();
+
+        if (selectedDateTime.isSameOrBefore(now)) {
+            setTimeError('Mohon pilih waktu setelah waktu saat ini');
+            setSelectedTime(null);
+            return;
+        }
+
+        setTimeError('');
         setSelectedTime(moment(time));
+
+        // Reset availability check when time changes
+        setIsAvailable(null);
     };
 
     const handleRoomSelect = (roomId) => {
@@ -102,8 +150,18 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     };
 
     const handleNextClick = () => {
+        const selectedDateTime = moment(selectedDate).set({
+            hour: moment(selectedTime).hour(),
+            minute: moment(selectedTime).minute()
+        });
+
+        if (selectedDateTime.isSameOrBefore(moment())) {
+            setTimeError('Please select a time after the current time');
+            return;
+        }
+
         if (!isAvailable || !selectedRoom || !selectedTime) {
-            alert('Please select a room and time first');
+            alert('Please select a valid room and time first');
             return;
         }
 
@@ -117,6 +175,23 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
             preserveState: true,
             preserveScroll: true,
         });
+    };
+
+    const isValidTime = (currentTime) => {
+        const selectedDateTime = moment(selectedDate).set({
+            hour: currentTime.hour(),
+            minute: currentTime.minute()
+        });
+        const now = moment();
+
+        // If selected date is today, only allow times after current time
+        if (selectedDateTime.isSame(now, 'day')) {
+            return currentTime.isAfter(now);
+        }
+
+        // For future dates, allow all times between 7 AM and 5 PM
+        const hour = currentTime.hour();
+        return hour >= 7 && hour < 17;
     };
 
     return (
@@ -179,7 +254,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
 
                 <main className="w-full p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="mt-8 flex flex-col gap-4">
-                        <div className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 space-y-4">
+                        <div className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 flex flex-col gap-4">
                             {floors.map((floor) => (
                                 <button
                                     key={floor}
@@ -334,28 +409,25 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                                 dateFormat={false}
                                                 timeFormat="HH:mm"
                                                 className="time-picker-custom"
+                                                timeConstraints={{
+                                                    hours: {min: 8, max: 23},
+                                                    minutes: {step: 5}
+                                                }}
+                                                isValidTime={isValidTime}
                                                 inputProps={{
                                                     className: "w-full bg-white text-gray-700 px-4 py-3 rounded-lg border border-gray-200 shadow-sm focus:border-buttonBlue focus:ring-1 focus:ring-buttonBlue focus:outline-none font-medium text-lg",
                                                     placeholder: "Pilih waktu mulai",
                                                     readOnly: true,
                                                     value: selectedTime ? moment(selectedTime).format('HH:mm') : ''
                                                 }}
-                                                renderInput={(props) => (
-                                                    <div className="relative">
-                                                        <input {...props} />
-                                                        <div
-                                                            className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                 className="h-6 w-6 text-gray-400" fill="none"
-                                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round"
-                                                                      strokeWidth={2}
-                                                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                )}
                                             />
+                                            {timeError && (
+                                                <div className="mt-2 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                                                    <p className="text-sm text-red-700">
+                                                        Mohon pilih waktu setelah waktu sekarang
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

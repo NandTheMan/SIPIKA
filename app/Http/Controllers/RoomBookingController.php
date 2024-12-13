@@ -6,6 +6,7 @@ use App\Models\Classroom;
 use App\Models\Booking;
 use App\Models\User;
 use App\Http\Helpers\SKSHelper;
+use App\Http\Middleware\ValidateBookingTime;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -93,34 +94,64 @@ class RoomBookingController extends Controller
 
     public function checkAvailability(Request $request)
     {
-        $request->validate([
-            'roomId' => 'required|exists:classrooms,classroom_id',
-            'date' => 'required|date',
-            'time' => 'required|date_format:H:i'
-        ]);
+        try {
+            $request->validate([
+                'roomId' => 'required|exists:classrooms,classroom_id',
+                'date' => 'required|date',
+                'time' => [
+                    'required',
+                    'date_format:H:i',
+                    function ($attribute, $value, $fail) use ($request) {
+                        $selectedDateTime = Carbon::parse($request->date . ' ' . $value);
+                        $now = Carbon::now('Asia/Singapore');
 
-        $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
-        $endDateTime = SKSHelper::calculateEndTime($startDateTime, 2); // Default to 2 SKS for initial check
+                        if ($selectedDateTime->lt($now)) {
+                            $fail('The selected time must be after the current time.');
+                        }
+                    },
+                ]
+            ]);
 
-        // Check for existing bookings that overlap with the requested time period
-        $existingBooking = Booking::where('classroom_id', $request->roomId)
-            ->whereIn('status', ['pending', 'in_progress'])
-            ->where(function($query) use ($startDateTime, $endDateTime) {
-                $query->where(function($q) use ($startDateTime, $endDateTime) {
-                    // Check if the existing booking overlaps with the requested time
-                    $q->whereBetween('start_time', [$startDateTime, $endDateTime])
-                        ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
-                        ->orWhere(function($q) use ($startDateTime, $endDateTime) {
-                            $q->where('start_time', '<=', $startDateTime)
-                                ->where('end_time', '>=', $endDateTime);
-                        });
-                });
-            })
-            ->exists();
+            $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
+            $endDateTime = SKSHelper::calculateEndTime($startDateTime, 2);
 
-        return response()->json([
-            'isAvailable' => !$existingBooking
-        ]);
+            // Check for existing bookings
+            $existingBooking = Booking::where('classroom_id', $request->roomId)
+                ->whereIn('status', ['pending', 'in_progress'])
+                ->where(function($query) use ($startDateTime, $endDateTime) {
+                    $query->where(function($q) use ($startDateTime, $endDateTime) {
+                        $q->whereBetween('start_time', [$startDateTime, $endDateTime])
+                            ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
+                            ->orWhere(function($innerQ) use ($startDateTime, $endDateTime) {
+                                $innerQ->where('start_time', '<=', $startDateTime)
+                                    ->where('end_time', '>=', $endDateTime);
+                            });
+                    });
+                })
+                ->first();
+
+            \Log::info('Availability check', [
+                'roomId' => $request->roomId,
+                'startDateTime' => $startDateTime,
+                'endDateTime' => $endDateTime,
+                'existingBooking' => $existingBooking ? true : false
+            ]);
+
+            return response()->json([
+                'isAvailable' => !$existingBooking,
+                'debug' => [
+                    'startDateTime' => $startDateTime->format('Y-m-d H:i:s'),
+                    'endDateTime' => $endDateTime->format('Y-m-d H:i:s'),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in checkAvailability: ' . $e->getMessage());
+            return response()->json([
+                'isAvailable' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function showCheckOut(Booking $booking)
