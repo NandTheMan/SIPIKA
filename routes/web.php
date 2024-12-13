@@ -43,6 +43,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [RoomBookingController::class, 'index'])->name('booking.index');
         Route::get('/details', [RoomBookingController::class, 'showDetails'])->name('booking.details');
         Route::post('/create', [RoomBookingController::class, 'createBooking'])->name('booking.create');
+        Route::get('/confirmation/{booking}', [RoomBookingController::class, 'showConfirmation'])->name('booking.confirmation');
+        Route::get('/check-in/{booking}', [RoomBookingController::class, 'showCheckIn'])->name('booking.check-in');
+        Route::post('/check-in/{booking}', [RoomBookingController::class, 'processCheckIn'])->name('booking.process-check-in');
+        Route::get('/check-out/{booking}', [RoomBookingController::class, 'showCheckOut'])->name('booking.check-out');
+        Route::post('/check-out/{booking}', [RoomBookingController::class, 'processCheckOut'])->name('booking.process-check-out');
 
         // API endpoints for React components
         Route::prefix('api')->group(function () {

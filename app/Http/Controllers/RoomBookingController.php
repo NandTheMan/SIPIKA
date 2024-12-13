@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Classroom;
 use App\Models\Booking;
 use App\Models\User;
+use App\Http\Helpers\SKSHelper;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
-use App\Http\Helpers\SKSHelper;
+use Illuminate\Support\Facades\Storage;
 
 class RoomBookingController extends Controller
 {
@@ -122,13 +123,122 @@ class RoomBookingController extends Controller
         ]);
     }
 
+    public function showCheckOut(Booking $booking)
+    {
+        if ($booking->status !== 'in_progress') {
+            return redirect()->route('bookings.show', $booking)
+                ->withErrors(['error' => 'This booking cannot be checked out.']);
+        }
+
+        $startPhoto = $booking->url_image_start
+            ? Storage::url($booking->url_image_start)
+            : null;
+
+        return Inertia::render('BookingCheckOut', [
+            'booking' => [
+                'id' => $booking->booking_id,
+                'classroom' => $booking->classroom->classroom_name,
+                'date' => $booking->start_time->format('Y-m-d'),
+                'startTime' => $booking->start_time->format('H:i'),
+                'endTime' => $booking->end_time->format('H:i'),
+                'duration' => $booking->sks_duration,
+                'status' => $booking->status,
+                'startPhoto' => $startPhoto,
+                'isEndTimeReached' => Carbon::now('Asia/Singapore')->gte($booking->end_time)
+            ]
+        ]);
+    }
+
+    public function processCheckOut(Request $request, Booking $booking)
+    {
+        if ($booking->status !== 'in_progress') {
+            return back()->withErrors(['error' => 'This booking cannot be checked out.']);
+        }
+
+        $request->validate([
+            'image_end' => 'required|image|max:5120'
+        ]);
+
+        try {
+            $imagePath = $request->file('image_end')->store('booking-images', 'public');
+
+            $booking->update([
+                'url_image_end' => $imagePath,
+                'status' => 'finished',
+                'end_time' => Carbon::now('Asia/Singapore')
+            ]);
+
+            return redirect()->route('home')
+                ->with('success', 'Booking completed successfully');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to process check-out: ' . $e->getMessage()]);
+        }
+    }
+    public function showCheckIn(Booking $booking)
+    {
+        $now = Carbon::now('Asia/Singapore');
+        $startTime = Carbon::parse($booking->start_time)->timezone('Asia/Singapore');
+        $earliestCheckIn = $startTime->copy()->subMinutes(15);
+        $latestCheckIn = $startTime->copy()->addMinutes(15);
+
+        // Calculate minutes until earliest check-in time
+        $minutesUntilStart = $now->lt($earliestCheckIn)
+            ? $now->diffInMinutes($earliestCheckIn)
+            : 0;
+
+        // Check if we can start check-in
+        $canStart = $now->between($earliestCheckIn, $latestCheckIn);
+
+        return Inertia::render('BookingCheckIn', [
+            'booking' => [
+                'id' => $booking->booking_id,
+                'classroom' => $booking->classroom->classroom_name,
+                'date' => $booking->start_time->format('Y-m-d'),
+                'startTime' => $booking->start_time->format('H:i'),
+                'endTime' => $booking->end_time->format('H:i'),
+                'duration' => $booking->sks_duration,
+                'checkInWindow' => [
+                    'earliest' => $earliestCheckIn->format('H:i'),
+                    'latest' => $latestCheckIn->format('H:i'),
+                ],
+                'currentTime' => $now->format('H:i'),
+                'canStart' => $canStart,
+                'minutesUntilStart' => $minutesUntilStart,
+                'status' => $booking->status
+            ]
+        ]);
+    }
+
+    public function processCheckIn(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'image_start' => 'required|image|max:5120'
+        ]);
+
+        try {
+            $imagePath = $request->file('image_start')->store('booking-images', 'public');
+
+            $booking->update([
+                'url_image_start' => $imagePath,
+                'status' => 'in_progress'
+            ]);
+
+            return redirect()->route('booking.check-out', $booking)
+                ->with('success', 'Check-in successful. You can now start using the classroom.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to process check-in: ' . $e->getMessage()]);
+        }
+    }
     public function createBooking(Request $request)
     {
         $request->validate([
             'roomId' => 'required|exists:classrooms,classroom_id',
             'date' => 'required|date',
             'startTime' => 'required|date_format:H:i',
-            'duration' => 'required|integer|min:1|max:6'
+            'duration' => 'required|integer|min:1|max:6',
+            'description' => 'required|string'
         ]);
 
         try {
@@ -145,18 +255,33 @@ class RoomBookingController extends Controller
                 'user_size' => auth()->user()->user_size
             ]);
 
-            return response()->json([
-                'success' => true,
-                'booking' => $booking,
-                'redirect' => route('bookings.start-photo', $booking)
-            ]);
+            return redirect()->route('booking.confirmation', ['booking' => $booking->booking_id]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create booking: ' . $e->getMessage()
-            ], 500);
+            return back()->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()]);
         }
+    }
+
+    public function showConfirmation(Booking $booking)
+    {
+        $earliestCheckIn = Carbon::parse($booking->start_time)->subMinutes(15);
+        $latestCheckIn = Carbon::parse($booking->start_time)->addMinutes(15);
+
+        return Inertia::render('BookingConfirmation', [
+            'booking' => [
+                'id' => $booking->booking_id,
+                'classroom' => $booking->classroom->classroom_name,
+                'date' => $booking->start_time->format('Y-m-d'),
+                'startTime' => $booking->start_time->format('H:i'),
+                'endTime' => $booking->end_time->format('H:i'),
+                'duration' => $booking->sks_duration,
+                'status' => $booking->status,
+                'checkInWindow' => [
+                    'earliest' => $earliestCheckIn->format('H:i'),
+                    'latest' => $latestCheckIn->format('H:i')
+                ]
+            ]
+        ]);
     }
 
     private function getCurrentBooking($classroom)

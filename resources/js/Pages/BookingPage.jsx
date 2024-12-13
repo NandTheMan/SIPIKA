@@ -91,17 +91,14 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
-        setCurrentStep(Math.max(currentStep, 2));
     };
 
     const handleTimeChange = (time) => {
         setSelectedTime(moment(time));
-        setCurrentStep(Math.max(currentStep, 2));
     };
 
     const handleRoomSelect = (roomId) => {
         setSelectedRoom(roomId);
-        setCurrentStep(3);
     };
 
     const handleNextClick = () => {
@@ -121,7 +118,6 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
             preserveScroll: true,
         });
     };
-
 
     return (
         <div className="h-screen">
@@ -309,7 +305,6 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                 </div>
                             )}
                         </div>
-
                         <div className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 flex flex-col sm:flex-row justify-between mt-1 w-full">
                             <div className="space-y-3">
                                 {roomData && (
@@ -320,7 +315,8 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                             <strong>Fasilitas:</strong>
                                             <div className="flex flex-wrap gap-2 mt-1">
                                                 {roomData.facilities.map((facility, index) => (
-                                                    <span key={index} className="bg-gray-200 px-3 py-1 rounded-lg text-sm">
+                                                    <span key={index}
+                                                          className="bg-gray-200 px-3 py-1 rounded-lg text-sm">
                                                         {facility}
                                                     </span>
                                                 ))}
@@ -328,43 +324,47 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                         </div>
                                     </>
                                 )}
-                                <div>
-                                    <strong>Waktu:</strong>
-                                    <div className="mt-1 space-y-2">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="flex-1">
-                                                <label className="block text-sm text-gray-600 mb-1">Jam Mulai</label>
-                                                <Datetime
-                                                    value={selectedTime}
-                                                    onChange={handleTimeChange}
-                                                    dateFormat={false}
-                                                    timeFormat="HH:mm"
-                                                    inputProps={{
-                                                        className: "w-full rounded-lg border-gray-300 bg-white px-3 py-2",
-                                                        placeholder: "Pilih Waktu Mulai"
-                                                    }}
-                                                />
-                                            </div>
+                                <div className="mt-4">
+                                    <strong className="text-gray-700 text-lg">Waktu Mulai:</strong>
+                                    <div className="mt-2">
+                                        <div className="relative">
+                                            <Datetime
+                                                value={selectedTime}
+                                                onChange={handleTimeChange}
+                                                dateFormat={false}
+                                                timeFormat="HH:mm"
+                                                className="time-picker-custom"
+                                                inputProps={{
+                                                    className: "w-full bg-white text-gray-700 px-4 py-3 rounded-lg border border-gray-200 shadow-sm focus:border-buttonBlue focus:ring-1 focus:ring-buttonBlue focus:outline-none font-medium text-lg",
+                                                    placeholder: "Pilih waktu mulai",
+                                                    readOnly: true,
+                                                    value: selectedTime ? moment(selectedTime).format('HH:mm') : ''
+                                                }}
+                                                renderInput={(props) => (
+                                                    <div className="relative">
+                                                        <input {...props} />
+                                                        <div
+                                                            className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                 className="h-6 w-6 text-gray-400" fill="none"
+                                                                 viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round"
+                                                                      strokeWidth={2}
+                                                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            />
                                         </div>
-                                        {selectedTime && (
-                                            <div className="bg-blue-50 p-3 rounded-lg text-sm">
-                                                <div className="flex justify-between text-blue-800">
-                                                    <span>Durasi:</span>
-                                                    <span>2 SKS (80 menit)</span>
-                                                </div>
-                                                <div className="flex justify-between text-blue-800 mt-1">
-                                                    <span>Selesai:</span>
-                                                    <span>{moment(selectedTime).add(80, 'minutes').format('HH:mm')}</span>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex flex-col justify-center ml-4">
                                 {isAvailable !== null && (
-                                    <div className={"font-medium mb-3 " + (isAvailable ? "text-green-600" : "text-red-600")}>
+                                    <div
+                                        className={"font-medium mb-3 " + (isAvailable ? "text-green-600" : "text-red-600")}>
                                         {isAvailable ? "Ruangan tersedia" : "Ruangan tidak tersedia"}
                                     </div>
                                 )}
