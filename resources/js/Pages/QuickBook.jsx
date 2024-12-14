@@ -51,7 +51,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
             {/* Header */}
             <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
                 <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/public" className="text-4xl sm:text-6xl font-philosopher text-white hover:opacity-80">
+                    <Link href="/home" className="text-4xl sm:text-6xl font-philosopher text-white hover:opacity-80">
                         SIPIKA
                     </Link>
                 </div>
@@ -189,7 +189,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                             {/* Action Buttons */}
                             <div className="flex justify-between pt-4">
                                 <Link
-                                    href="/public"
+                                    href="/home"
                                     className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
                                     Cancel

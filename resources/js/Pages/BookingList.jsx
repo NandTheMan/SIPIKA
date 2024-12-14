@@ -122,7 +122,7 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                     {/* Quick Actions */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                         <Link
-                            href="/bookings/quick-book"
+                            href="/quick-book"
                             className="flex items-center gap-4 bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]"
                         >
                             <div className="p-3 bg-white/20 rounded-lg">
@@ -191,14 +191,34 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                             <div className="flex gap-3">
                                                 {booking.status === 'pending' && (
                                                     <>
-                                                        <button
-                                                            onClick={() => {}} // Will implement cancel functionality
-                                                            className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors font-medium"
+                                                        <form
+                                                            onSubmit={(e) => {
+                                                                e.preventDefault();
+                                                                router.post(`/my-bookings/${booking.id}/cancel`);
+                                                            }}
+                                                            className="inline-block"
                                                         >
-                                                            Cancel
-                                                        </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (confirm('Are you sure you want to cancel this booking?')) {
+                                                                        router.post(`/my-bookings/${booking.id}/cancel`, {}, {
+                                                                            onSuccess: () => {
+                                                                                // Optional: Show success message
+                                                                                window.location.reload();
+                                                                            },
+                                                                            onError: () => {
+                                                                                alert('Failed to cancel booking');
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors font-medium"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </form>
                                                         <Link
-                                                            href={`/bookings/${booking.id}/start-photo`}
+                                                            href={`/book-room/check-in/${booking.id}`}  // Changed from /bookings/${booking.id}/start-photo
                                                             className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
                                                         >
                                                             Start Check-in
@@ -206,7 +226,7 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                     </>
                                                 )}
                                                 <Link
-                                                    href={`/bookings/${booking.id}`}
+                                                    href={`/my-bookings/${booking.id}`}
                                                     className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                                 >
                                                     <FontAwesomeIcon icon={faEye} />
