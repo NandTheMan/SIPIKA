@@ -6,8 +6,10 @@ import ReportsCarousel from '@/Components/ReportsCarousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faEye } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faClock, faGauge, faMagnifyingGlass, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-
+import NotificationPopover from '@/Components/NotificationPopover';
+import PinButton from '@/Components/PinButton';
 import axios from 'axios';
+import MenuDropdown from '@/Components/MenuDropdown';
 
 function FloorView({ floorNumber, classrooms, onClose }) {
     return (
@@ -32,6 +34,17 @@ function FloorView({ floorNumber, classrooms, onClose }) {
                                     : 'bg-green-50 border-green-200 hover:shadow-green-200'
                             } hover:shadow-lg`}
                         >
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-bold text-lg">{classroom.name}</h3>
+                                <PinButton
+                                    classroomId={classroom.id}
+                                    isPinned={classroom.isPinned}
+                                    onPinChange={(isPinned) => {
+                                        // Handle pin status change
+                                    }}
+                                />
+                            </div>
+
                             <h3 className="font-bold text-lg mb-2">{classroom.name}</h3>
                             <p className="text-gray-600">Kapasitas: {classroom.capacity} orang</p>
 
@@ -65,7 +78,14 @@ function FloorView({ floorNumber, classrooms, onClose }) {
     );
 }
 
-export default function Homepage({ bookingData = [], reportData = [], userName, userMajor, classroomsByFloor = {}, canBookRoom }) {
+export default function Homepage({
+                                     bookingData = [],
+                                     reportData = [],
+                                     userName,
+                                     userMajor,
+                                     classroomsByFloor = {},
+                                     canBookRoom
+                                 }) {
     const [date, setDate] = useState(new Date());
     const [selectedFloor, setSelectedFloor] = useState(null);
     const [dateBookings, setDateBookings] = useState(bookingData);
@@ -75,6 +95,8 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
         setDate(newDate);
         fetchBookingsForDate(newDate);
     };
+
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const fetchBookingsForDate = async (selectedDate) => {
         setIsLoading(true);
@@ -122,8 +144,12 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                     >
                         <FontAwesomeIcon icon={faSignOutAlt} className="text-xl"/>
                     </button>
-                    <FontAwesomeIcon icon={faBell} className="text-white cursor-pointer hover:text-gray-200 transition-colors"/>
-                    <FontAwesomeIcon icon={faBars} className="text-white cursor-pointer hover:text-gray-200 transition-colors"/>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 
@@ -324,6 +350,18 @@ export default function Homepage({ bookingData = [], reportData = [], userName, 
                     </p>
                 </div>
             </footer>
+
+            <NotificationPopover
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                pinnedClassrooms={[]}
+                onPin={async (classroomId) => {
+                    // Handle pin
+                }}
+                onUnpin={async (classroomId) => {
+                    // Handle unpin
+                }}
+            />
 
             {/* Custom Styles */}
             <style>

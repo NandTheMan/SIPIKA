@@ -220,12 +220,10 @@ class RoomBookingController extends Controller
         $earliestCheckIn = $startTime->copy()->subMinutes(15);
         $latestCheckIn = $startTime->copy()->addMinutes(15);
 
-        // Calculate minutes until earliest check-in time
         $minutesUntilStart = $now->lt($earliestCheckIn)
             ? $now->diffInMinutes($earliestCheckIn)
             : 0;
 
-        // Check if we can start check-in
         $canStart = $now->between($earliestCheckIn, $latestCheckIn);
 
         return Inertia::render('BookingCheckIn', [

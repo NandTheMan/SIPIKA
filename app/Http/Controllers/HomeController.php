@@ -89,6 +89,28 @@ class HomeController extends Controller
         ]);
     }
 
+    public function viewReport($id)
+    {
+        $report = Report::with(['reportedUser', 'reporterUser', 'classroom'])
+            ->findOrFail($id);
+
+        return Inertia::render('ReportView', [
+            'report' => [
+                'id' => $report->report_id,
+                'classroom' => $report->classroom->classroom_name,
+                'reportTime' => $report->report_time->format('M d, Y H:i'),
+                'reportedUser' => $report->reportedUser->username,
+                'reporter' => $report->reporterUser->username,
+                'description' => $report->report_description,
+                'status' => $report->report_status,
+                'resolvedTime' => $report->report_resolved_time ?
+                    $report->report_resolved_time->format('M d, Y H:i') : null,
+                'imageUrl' => $report->url_image_report ?
+                    Storage::url($report->url_image_report) : null
+            ]
+        ]);
+    }
+
     public function getFloorDetails($floor)
     {
         $classrooms = Classroom::where('floor', $floor)

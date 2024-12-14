@@ -10,6 +10,11 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomBookingController;
 use App\Http\Controllers\BookingApiController;
+use App\Http\Controllers\PinController;
+use App\Http\Controllers\ReactProfileController;
+use App\Http\Controllers\ReactBookingController;
+use App\Http\Controllers\ClassroomOverviewController;
+use App\Http\Controllers\QuickBookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,11 +43,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     Route::get('/api/bookings', [BookingApiController::class, 'getBookingsByDate']);
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
+
+    Route::get('/classrooms-overview', [ClassroomOverviewController::class, 'index'])
+        ->name('classrooms.overview');
+    Route::get('/api/facilities', [ClassroomOverviewController::class, 'getFacilities']);
+    Route::get('/api/classrooms/{classroom}/current-booking', [ClassroomOverviewController::class, 'getCurrentBooking']);
+
+    Route::prefix('quick-book')->group(function () {
+        Route::get('/', [QuickBookController::class, 'index'])->name('quick-book.index');
+        Route::post('/api/quick-book', [QuickBookController::class, 'store'])->name('quick-book.store');
+    });
+
+    Route::prefix('my-bookings')->group(function () {
+        Route::get('/', [ReactBookingController::class, 'index'])->name('my-bookings.index');
+        Route::get('/{booking}', [ReactBookingController::class, 'show'])->name('my-bookings.show');
+        Route::post('/{booking}/cancel', [ReactBookingController::class, 'cancelBooking'])
+            ->name('my-bookings.cancel');
+    });
 
     // New React-based Booking System
     Route::prefix('book-room')->group(function () {
@@ -69,6 +93,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->middleware('throttle:60,1');
         });
     });
+
+    Route::get('/api/pinned-classrooms', [PinController::class, 'getPinnedClassrooms']);
+    Route::post('/api/classrooms/pin', [PinController::class, 'pinClassroom']);
+    Route::post('/api/classrooms/unpin', [PinController::class, 'unpinClassroom']);
 
     // Classrooms
     Route::get('/classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
@@ -115,6 +143,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [ReactReportController::class, 'create'])->name('reports.create');
         Route::post('/', [ReactReportController::class, 'store'])->name('reports.store');
         Route::get('/{report}', [ReactReportController::class, 'show'])->name('reports.show');
+        // New route for viewing report details
+        Route::get('/view/{id}', [HomeController::class, 'viewReport'])->name('reports.view');
 
         // API endpoints for React components
         Route::prefix('api')->group(function () {
