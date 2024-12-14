@@ -12,12 +12,14 @@ class PinController extends Controller
     public function getPinnedClassrooms()
     {
         $user = auth()->user();
+        $now = now();
+
         $pinnedClassrooms = PinnedClassroom::where('user_id', $user->user_id)
-            ->with(['classroom.bookings' => function($query) {
+            ->with(['classroom.bookings' => function($query) use ($now) {
                 $query->whereIn('status', ['pending', 'in_progress'])
-                    ->where('start_time', '<=', now())
-                    ->where('end_time', '>=', now());
-            }])
+                    ->where('start_time', '<=', $now)
+                    ->where('end_time', '>=', $now);
+            }, 'classroom.facilities'])
             ->get()
             ->map(function($pin) {
                 $currentBooking = $pin->classroom->bookings->first();
@@ -26,6 +28,9 @@ class PinController extends Controller
                     'id' => $pin->id,
                     'classroom_id' => $pin->classroom->classroom_id,
                     'classroom_name' => $pin->classroom->classroom_name,
+                    'capacity' => $pin->classroom->classroom_capacity,
+                    'floor' => $pin->classroom->floor,
+                    'facilities' => $pin->classroom->facilities->pluck('facility_name'),
                     'is_available' => !$currentBooking,
                     'current_booking' => $currentBooking ? [
                         'end_time' => $currentBooking->end_time->format('H:i'),

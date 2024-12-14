@@ -11,7 +11,7 @@ import PinButton from '@/Components/PinButton';
 import axios from 'axios';
 import MenuDropdown from '@/Components/MenuDropdown';
 
-function FloorView({ floorNumber, classrooms, onClose }) {
+function FloorView({ floorNumber, classrooms, onClose, pinnedClassrooms, setPinnedClassrooms }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto relative shadow-xl">
@@ -38,14 +38,18 @@ function FloorView({ floorNumber, classrooms, onClose }) {
                                 <h3 className="font-bold text-lg">{classroom.name}</h3>
                                 <PinButton
                                     classroomId={classroom.id}
-                                    isPinned={classroom.isPinned}
+                                    isPinned={pinnedClassrooms.includes(classroom.id)}
                                     onPinChange={(isPinned) => {
-                                        // Handle pin status change
+                                        if (isPinned) {
+                                            setPinnedClassrooms([...pinnedClassrooms, classroom.id]);
+                                        } else {
+                                            setPinnedClassrooms(pinnedClassrooms.filter(id => id !== classroom.id));
+                                        }
                                     }}
                                 />
                             </div>
 
-                            <h3 className="font-bold text-lg mb-2">{classroom.name}</h3>
+                            {/* Removed the duplicate room name */}
                             <p className="text-gray-600">Kapasitas: {classroom.capacity} orang</p>
 
                             <div className="mt-2">
@@ -64,7 +68,7 @@ function FloorView({ floorNumber, classrooms, onClose }) {
 
                             {!classroom.isBooked && (
                                 <Link
-                                    href={`/bookings/create?classroom=${classroom.id}`}
+                                    href={`/book-room/`}
                                     className="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm transition-colors"
                                 >
                                     Pesan Ruangan
@@ -90,6 +94,7 @@ export default function Homepage({
     const [selectedFloor, setSelectedFloor] = useState(null);
     const [dateBookings, setDateBookings] = useState(bookingData);
     const [isLoading, setIsLoading] = useState(false);
+    const [pinnedClassrooms, setPinnedClassrooms] = useState([]);
 
     const handleDateChange = (newDate) => {
         setDate(newDate);
@@ -97,6 +102,19 @@ export default function Homepage({
     };
 
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchPinnedClassrooms = async () => {
+            try {
+                const response = await axios.get('/api/pinned-classrooms');
+                setPinnedClassrooms(response.data.map(pc => pc.classroom_id));
+            } catch (error) {
+                console.error('Error fetching pinned classrooms:', error);
+            }
+        };
+
+        fetchPinnedClassrooms();
+    }, []);
 
     const fetchBookingsForDate = async (selectedDate) => {
         setIsLoading(true);
@@ -162,7 +180,7 @@ export default function Homepage({
                             Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana.
                         </p>
                         <Link
-                            href="/book-room"
+                            href="/classrooms-overview"
                             className='inline-flex items-center gap-2 rounded-lg px-4 py-3 border-2 border-[#2D3C93] text-[#2D3C93] hover:bg-[#2D3C93] hover:text-white transition-colors font-medium'
                         >
                             <FontAwesomeIcon icon={faClock} />
@@ -211,6 +229,8 @@ export default function Homepage({
                             floorNumber={selectedFloor}
                             classrooms={classroomsByFloor[selectedFloor]}
                             onClose={() => setSelectedFloor(null)}
+                            pinnedClassrooms={pinnedClassrooms}
+                            setPinnedClassrooms={setPinnedClassrooms}
                         />
                     )}
 
@@ -224,7 +244,7 @@ export default function Homepage({
                             <p className='text-[20px]'>Quick Book</p>
                         </Link>
                         <Link
-                            href="/classrooms"
+                            href="/book-room"
                             className='w-fit h-100 bg-[#B6B6B6] px-6 flex items-center rounded-2xl hover:bg-[#8ea0c1] transition-colors text-white shadow'
                         >
                             <FontAwesomeIcon icon={faMagnifyingGlass} className='fa-xl'/>
@@ -354,12 +374,24 @@ export default function Homepage({
             <NotificationPopover
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
-                pinnedClassrooms={[]}
+                pinnedClassrooms={classroomsByFloor[selectedFloor]?.filter(classroom =>
+                    pinnedClassrooms.includes(classroom.id)
+                ) || []}
                 onPin={async (classroomId) => {
-                    // Handle pin
+                    try {
+                        await axios.post('/api/classrooms/pin', { classroom_id: classroomId });
+                        setPinnedClassrooms([...pinnedClassrooms, classroomId]);
+                    } catch (error) {
+                        console.error('Error pinning classroom:', error);
+                    }
                 }}
                 onUnpin={async (classroomId) => {
-                    // Handle unpin
+                    try {
+                        await axios.post('/api/classrooms/unpin', { classroom_id: classroomId });
+                        setPinnedClassrooms(pinnedClassrooms.filter(id => id !== classroomId));
+                    } catch (error) {
+                        console.error('Error unpinning classroom:', error);
+                    }
                 }}
             />
 
