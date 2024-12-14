@@ -217,7 +217,7 @@ export default function Homepage({
                     {/* Quick Book */}
                     <div className='flex justify-center mt-10 gap-3'>
                         <Link
-                            href="/bookings/quick-book"
+                            href="/quick-book"
                             className='flex bg-[#2D3C93] w-fit items-center gap-3 py-3 px-6 rounded-2xl hover:bg-[#1e2a6a] transition-colors text-white font-semibold shadow'
                         >
                             <FontAwesomeIcon icon={faGauge} className='fa-xl'/>

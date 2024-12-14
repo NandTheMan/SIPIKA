@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faUser } from "@fortawesome/free-regular-svg-icons";
-import MenuDropdown from '@/Components/MenuDropdown';
-import NotificationPopover from '@/Components/NotificationPopover';
+import MenuDropdown from '@/Components/MenuDropdown.jsx';
+import NotificationPopover from '@/Components/NotificationPopover.jsx';
 import { Calendar as CalendarIcon, Clock, Users, ChevronRight } from 'lucide-react';
 import Calendar from 'react-calendar';
 import Datetime from 'react-datetime';
@@ -20,13 +20,12 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post('/api/quick-book', {
-            onSuccess: (response) => {
-                // Will handle redirect to photo upload page
-                if (response.booking_id) {
-                    window.location.href = `/book-room/check-in/${response.booking_id}`;
-                }
-            },
+        post('/quick-book/store', {
+            preserveScroll: true,
+            onError: (errors) => {
+                console.error('Booking error:', errors);
+                // Handle validation errors here if needed
+            }
         });
     };
 
@@ -52,7 +51,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
             {/* Header */}
             <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
                 <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/" className="text-4xl sm:text-6xl font-philosopher text-white hover:opacity-80">
+                    <Link href="/public" className="text-4xl sm:text-6xl font-philosopher text-white hover:opacity-80">
                         SIPIKA
                     </Link>
                 </div>
@@ -190,7 +189,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                             {/* Action Buttons */}
                             <div className="flex justify-between pt-4">
                                 <Link
-                                    href="/"
+                                    href="/public"
                                     className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
                                     Cancel

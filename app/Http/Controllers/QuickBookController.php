@@ -102,15 +102,11 @@ class QuickBookController extends Controller
                 'user_size' => $user->user_size
             ]);
 
-            return response()->json([
-                'booking_id' => $booking->booking_id,
-                'message' => 'Booking created successfully'
-            ]);
+            return redirect()->route('booking.confirmation', ['booking' => $booking])
+                ->with('success', 'Booking created successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to create booking: ' . $e->getMessage()
-            ], 500);
+            return back()->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()]);
         }
     }
 }

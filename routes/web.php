@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('quick-book')->group(function () {
         Route::get('/', [QuickBookController::class, 'index'])->name('quick-book.index');
         Route::post('/api/quick-book', [QuickBookController::class, 'store'])->name('quick-book.store');
+        Route::post('store', [QuickBookController::class, 'store'])->name('quick-book.store'); // Add alternative route
     });
 
     Route::prefix('my-bookings')->group(function () {
