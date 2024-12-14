@@ -303,7 +303,7 @@ export default function Homepage({
                                                     <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
                                                     <td className='py-2 px-4 whitespace-nowrap text-center'>
                                                         <Link
-                                                            href={`/bookings/${item.id}`}
+                                                            href={`/my-bookings/${item.id}`}
                                                             className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors text-sm font-medium'
                                                         >
                                                             <FontAwesomeIcon icon={faEye} className='fa-sm'/>
