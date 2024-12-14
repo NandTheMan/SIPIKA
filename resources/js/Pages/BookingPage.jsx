@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import './BookingPage.css';
 import Calendar from 'react-calendar';
 import axios from 'axios';
 import Datetime from 'react-datetime';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faUser } from '@fortawesome/free-regular-svg-icons';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { router } from '@inertiajs/core';
+import { faBell } from '@fortawesome/free-regular-svg-icons';
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import MenuDropdown from '@/Components/MenuDropdown';
+import NotificationPopover from '@/Components/NotificationPopover';
 
 export default function BookingPage({ userName, userMajor, classroomsByFloor }) {
     // State Management
@@ -22,6 +23,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     const [currentStep, setCurrentStep] = useState(1);
     const [floors, setFloors] = useState(Object.keys(classroomsByFloor || {}).sort());
     const [timeError, setTimeError] = useState('');
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     // Refs for step visualization
     const step1Ref = useRef(null);
@@ -194,25 +196,39 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         return hour >= 7 && hour < 17;
     };
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <div className="h-screen">
-            <header className="w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-[51px] flex justify-between">
-                <div className="absolute top-4 left-4 sm:top-6 sm:left-8">
-                    <Link href="/" className="hover:opacity-80 transition-opacity">
-                        <h1 className="text-4xl sm:text-6xl font-philosopher text-white">SIPIKA</h1>
+        <div className="min-h-screen bg-lightGradient font-inter">
+            <header className='w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center'>
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
                 </div>
-                <div className="absolute top-12 right-6 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={faUser} style={{color: "#F1F1F1"}}/>
-                        <p className="text-white font-sfproreg">{userName} ({userMajor})</p>
+                <div className='flex items-center gap-6'>
+                    <div className='text-white font-sfproreg'>
+                        {userName} ({userMajor})
                     </div>
-                    <FontAwesomeIcon icon={faBell} style={{color: "#F1F1F1"}}/>
-                    <FontAwesomeIcon icon={faBars} style={{color: "#F1F1F1"}}/>
+                    <button
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 
-            <div className="flex bg-lightGradient">
+            <div className="flex">
                 {/* Progress Steps */}
                 <div className="hidden md:flex w-1/16 h-[84vh] place-self-center items-center justify-center border-1.5 border-white/60 bg-lightGradient shadow-md rounded-lg p-4 my-12 ml-6 relative">
                     <div className="relative flex flex-col items-center h-full">
@@ -454,6 +470,12 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                     </div>
                 </main>
             </div>
+
+            <NotificationPopover
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                pinnedClassrooms={[]}
+            />
         </div>
     );
 }

@@ -365,7 +365,7 @@ export default function Homepage({
                         </div>
                     </div>
                     <p className='text-sm text-gray-200'>
-                        Copyright© SIPIKA. All Rights Reserved
+                        Copyright© 2024 SIPIKA. All Rights Reserved
                     </p>
                 </div>
             </footer>

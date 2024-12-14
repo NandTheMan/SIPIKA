@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faUser, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBell } from "@fortawesome/free-regular-svg-icons";
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link, router } from '@inertiajs/react';
+import MenuDropdown from '@/Components/MenuDropdown';
 
 export default function BookingDetailsPage({ auth, bookingData }) {
     const [currentStep, setCurrentStep] = useState(2);
@@ -10,6 +12,7 @@ export default function BookingDetailsPage({ auth, bookingData }) {
     const [duration, setDuration] = useState("1 SKS (40 menit)");
     const [description, setDescription] = useState("");
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const step1Ref = useRef(null);
     const step2Ref = useRef(null);
@@ -68,24 +71,36 @@ export default function BookingDetailsPage({ auth, bookingData }) {
         router.get('/book-room');
     };
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <div className="min-h-screen bg-lightGradient flex flex-col font-sfproreg">
+        <div className="min-h-screen bg-lightGradient flex flex-col font-inter">
             {/* Header */}
-            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
-                <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/" className="text-4xl sm:text-5xl font-philosopher text-white hover:opacity-80">
-                        SIPIKA
+            <header className='w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center'>
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
                 </div>
-                <div className='absolute top-8 right-6 sm:top-8 sm:right-8 flex items-center gap-4 sm:gap-6'>
-                    <div className='flex items-center gap-2 sm:gap-3'>
-                        <FontAwesomeIcon icon={faUser} className="text-white text-lg sm:text-xl" />
-                        <p className='text-white text-sm sm:text-base'>
-                            {auth.user.username} ({auth.user.major})
-                        </p>
+                <div className='flex items-center gap-6'>
+                    <div className='text-white font-sfproreg'>
+                        {auth.user.username} ({auth.user.major})
                     </div>
-                    <FontAwesomeIcon icon={faBell} className="text-white text-lg sm:text-xl cursor-pointer hover:text-gray-300" />
-                    <FontAwesomeIcon icon={faBars} className="text-white text-lg sm:text-xl cursor-pointer hover:text-gray-300" />
+                    <button
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 
@@ -241,6 +256,12 @@ export default function BookingDetailsPage({ auth, bookingData }) {
                     </form>
                 </div>
             </div>
+
+            <NotificationPopover
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                pinnedClassrooms={[]}
+            />
         </div>
     );
 }

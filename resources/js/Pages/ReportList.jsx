@@ -1,27 +1,42 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faUser, faBars, faCheckCircle, faClipboardList, faHourglassHalf } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faClipboardList, faCheckCircle, faHourglassHalf, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import MenuDropdown from '@/Components/MenuDropdown';
 
 export default function ReportList({ reports = [], auth }) {
+    const [isNotificationOpen, setIsNotificationOpen] = React.useState(false);
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <div className="min-h-screen bg-lightGradient">
+        <div className="min-h-screen bg-lightGradient font-inter">
             {/* Header */}
-            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
-                <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/" className="text-4xl sm:text-5xl font-philosopher text-white hover:opacity-80">
-                        SIPIKA
+            <header className='w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center'>
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
                 </div>
-                <div className='absolute top-8 right-6 sm:top-8 sm:right-8 flex items-center gap-4 sm:gap-6'>
-                    <div className='flex items-center gap-2 sm:gap-3'>
-                        <FontAwesomeIcon icon={faUser} className="text-white text-lg sm:text-xl" />
-                        <p className='text-white text-sm sm:text-base'>
-                            {auth.user.username} ({auth.user.major})
-                        </p>
+                <div className='flex items-center gap-6'>
+                    <div className='text-white font-sfproreg'>
+                        {auth.user.username} ({auth.user.major})
                     </div>
-                    <FontAwesomeIcon icon={faBell} className="text-white text-lg sm:text-xl cursor-pointer hover:text-gray-300" />
-                    <FontAwesomeIcon icon={faBars} className="text-white text-lg sm:text-xl cursor-pointer hover:text-gray-300" />
+                    <button
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 
@@ -123,6 +138,12 @@ export default function ReportList({ reports = [], auth }) {
                     </div>
                 </div>
             </main>
+
+            {/* Add Notification Popover (if you have it) */}
+            {/* <NotificationPopover
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+            /> */}
         </div>
     );
 }
