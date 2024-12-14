@@ -19,7 +19,7 @@ const MenuDropdown = () => {
 
     const menuItems = [
         { label: 'Profile', icon: User, href: '/profile/edit' },
-        { label: 'My Bookings', icon: Calendar, href: '/bookings' },
+        { label: 'My Bookings', icon: Calendar, href: '/my-bookings' },
         { label: 'My Reports', icon: FileText, href: '/reports' },
     ];
 
