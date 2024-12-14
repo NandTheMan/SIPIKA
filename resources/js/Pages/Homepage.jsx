@@ -199,7 +199,6 @@ export default function Homepage({
                             src="/images/lantai4.png"
                             alt="Lantai 4"
                             width={580}
-                            onClick={() => setSelectedFloor(4)}
                         />
                         <img
                             className="absolute top-[300px] z-[9] hover:translate-x-[60px] transition-transform duration-300 cursor-pointer drop-shadow-xl"
