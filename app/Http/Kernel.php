@@ -48,7 +48,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'booking.time' => \App\Http\Middleware\ValidateBookingTime::class,
         'validate.session' => \App\Http\Middleware\ValidateSession::class,
-        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class, // Add this line
     ];
 
     // Remove the $routeMiddleware property entirely

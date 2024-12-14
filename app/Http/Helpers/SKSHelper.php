@@ -8,6 +8,11 @@ class SKSHelper
 {
     const MINUTES_PER_SKS = 40;
 
+    public static function getDuration(): int
+    {
+        return self::MINUTES_PER_SKS;
+    }
+
     public static function calculateEndTime(Carbon $startTime, int $sksUnits): Carbon
     {
         return $startTime->copy()->addMinutes($sksUnits * self::MINUTES_PER_SKS);

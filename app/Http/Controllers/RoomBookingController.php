@@ -76,20 +76,29 @@ class RoomBookingController extends Controller
 
     public function getRoomDetails($id)
     {
-        $classroom = Classroom::with('facilities')->findOrFail($id);
-        $currentBooking = $this->getCurrentBooking($classroom);
+        try {
+            $classroom = Classroom::with(['facilities', 'bookings' => function($query) {
+                $query->whereIn('status', ['pending', 'in_progress'])
+                    ->where('start_time', '<=', now())
+                    ->where('end_time', '>=', now());
+            }])->findOrFail($id);
 
-        return response()->json([
-            'id' => $classroom->classroom_id,
-            'name' => $classroom->classroom_name,
-            'capacity' => $classroom->classroom_capacity,
-            'facilities' => $classroom->facilities->pluck('facility_name'),
-            'isBooked' => (bool)$currentBooking,
-            'currentBooking' => $currentBooking ? [
-                'endTime' => $currentBooking->end_time->format('H:i'),
-                'userCount' => $currentBooking->user_size
-            ] : null
-        ]);
+            $currentBooking = $this->getCurrentBooking($classroom);
+
+            return response()->json([
+                'id' => $classroom->classroom_id,
+                'name' => $classroom->classroom_name,
+                'capacity' => $classroom->classroom_capacity,
+                'facilities' => $classroom->facilities->pluck('facility_name'),
+                'isBooked' => (bool)$currentBooking,
+                'currentBooking' => $currentBooking ? [
+                    'endTime' => $currentBooking->end_time->format('H:i'),
+                    'userCount' => $currentBooking->user_size
+                ] : null
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Room not found'], 404);
+        }
     }
 
     public function checkAvailability(Request $request)
@@ -109,13 +118,13 @@ class RoomBookingController extends Controller
                             $fail('The selected time must be after the current time.');
                         }
                     },
-                ]
+                ],
+                'duration' => 'required|integer|min:1|max:6' // Add duration validation
             ]);
 
             $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
-            $endDateTime = SKSHelper::calculateEndTime($startDateTime, 2);
+            $endDateTime = SKSHelper::calculateEndTime($startDateTime, $request->duration);  // Use requested duration
 
-            // Check for existing bookings
             $existingBooking = Booking::where('classroom_id', $request->roomId)
                 ->whereIn('status', ['pending', 'in_progress'])
                 ->where(function($query) use ($startDateTime, $endDateTime) {

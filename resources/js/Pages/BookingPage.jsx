@@ -62,7 +62,6 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         }
     }, [selectedRoom]);
 
-    // Check availability when room, date, or time changes
     useEffect(() => {
         const checkAvailability = async () => {
             if (selectedRoom && selectedDate && selectedTime) {
@@ -81,19 +80,18 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                             roomId: selectedRoom,
                             date: dateString,
                             time: timeString,
+                            duration: 2 // Or whatever duration you want to use
                         });
-                        console.log('Availability response:', response.data); // Debug log
+                        console.log('Availability response:', response.data);
                         setIsAvailable(response.data.isAvailable);
                     } catch (error) {
                         console.error('Error checking availability:', error);
                         setIsAvailable(false);
                     }
                 } else {
+                    console.log('Selected time is before current time');
                     setIsAvailable(false);
                 }
-            } else {
-                // Reset availability if any required field is missing
-                setIsAvailable(null);
             }
         };
 
@@ -128,6 +126,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
     };
 
     const handleTimeChange = (time) => {
+        console.log('Time selected:', time); // Debug log
         const selectedDateTime = moment(selectedDate).set({
             hour: time.hour(),
             minute: time.minute()
@@ -135,46 +134,47 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         const now = moment();
 
         if (selectedDateTime.isSameOrBefore(now)) {
-            setTimeError('Mohon pilih waktu setelah waktu saat ini');
+            setTimeError('Mohon pilih waktu setelah waktu sekarang');
             setSelectedTime(null);
             return;
         }
 
         setTimeError('');
-        setSelectedTime(moment(time));
-
-        // Reset availability check when time changes
-        setIsAvailable(null);
+        setSelectedTime(time);
+        console.log('Updated selected time:', time); // Debug log
     };
 
     const handleRoomSelect = (roomId) => {
+        console.log('Room selected:', roomId);
         setSelectedRoom(roomId);
+
+        // Fix: Update the URL to match the correct endpoint
+        axios.get(`/book-room/api/rooms/${roomId}`)  // Changed from booking/rooms to book-room/api/rooms
+            .then(response => {
+                console.log('Room data fetched:', response.data);
+                setRoomData(response.data);
+                // Check availability after room data is fetched
+                if (selectedTime) {
+                    checkAvailability();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching room details:', error);
+                setRoomData(null);
+            });
     };
 
     const handleNextClick = () => {
-        const selectedDateTime = moment(selectedDate).set({
-            hour: moment(selectedTime).hour(),
-            minute: moment(selectedTime).minute()
-        });
-
-        if (selectedDateTime.isSameOrBefore(moment())) {
-            setTimeError('Please select a time after the current time');
-            return;
-        }
-
-        if (!isAvailable || !selectedRoom || !selectedTime) {
-            alert('Please select a valid room and time first');
-            return;
-        }
+        const dateString = moment(selectedDate).format('YYYY-MM-DD');
+        const timeString = moment(selectedTime).format('HH:mm');
 
         router.visit('/book-room/details', {
             method: 'get',
             data: {
                 roomId: selectedRoom,
-                date: moment(selectedDate).format('YYYY-MM-DD'),
-                startTime: moment(selectedTime).format('HH:mm'),
+                date: dateString,
+                startTime: timeString,
             },
-            preserveState: true,
             preserveScroll: true,
         });
     };
@@ -200,6 +200,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         e.preventDefault();
         router.post('/logout');
     };
+
 
     return (
         <div className="min-h-screen bg-lightGradient font-inter">
@@ -387,6 +388,7 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                                     ? 'bg-buttonBlue text-white'
                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             } rounded-lg px-6 py-6 shadow-lg cursor-pointer transition-colors duration-200 flex items-center justify-center text-center`}
+                                            style={{ cursor: 'pointer' }} // Explicitly set cursor
                                         >
                                             <p className="font-bold text-lg">{room.name}</p>
                                         </div>
@@ -394,7 +396,8 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                 </div>
                             )}
                         </div>
-                        <div className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 flex flex-col sm:flex-row justify-between mt-1 w-full">
+                        <div
+                            className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 flex flex-col sm:flex-row justify-between mt-1 w-full">
                             <div className="space-y-3">
                                 {roomData && (
                                     <>
@@ -458,10 +461,11 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                 <button
                                     onClick={handleNextClick}
                                     disabled={!isAvailable || !selectedRoom || !selectedTime}
-                                    className={"text-white px-8 py-4 rounded-lg transition-colors duration-200 " +
-                                        (isAvailable && selectedRoom && selectedTime
-                                            ? "bg-buttonBlue hover:bg-buttonBlueHover"
-                                            : "bg-gray-400 cursor-not-allowed")}
+                                    className={`text-white px-8 py-4 rounded-lg transition-colors duration-200 ${
+                                        isAvailable && selectedRoom && selectedTime
+                                            ? "bg-buttonBlue hover:bg-buttonBlueHover cursor-pointer"
+                                            : "bg-gray-400 cursor-not-allowed"
+                                    }`}
                                 >
                                     Next →
                                 </button>

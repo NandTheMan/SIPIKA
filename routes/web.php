@@ -12,6 +12,7 @@ use App\Http\Controllers\RoomBookingController;
 use App\Http\Controllers\BookingApiController;
 use App\Http\Controllers\PinController;
 use App\Http\Controllers\ReactProfileController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReactBookingController;
 use App\Http\Controllers\ClassroomOverviewController;
 use App\Http\Controllers\QuickBookController;
@@ -26,6 +27,19 @@ Route::get('/', function () {
     return redirect('/signin');
 });
 
+Route::get('/admin/test', function () {
+    return 'This is a test admin route';
+});
+
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/test-auth', function () {
+        return 'This is an authenticated admin route';
+    });
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::put('/users/{user}/penalize', [AdminController::class, 'penalizeUser'])->name('admin.users.penalize');
+    Route::put('/reports/{report}/resolve', [AdminController::class, 'resolveReport'])->name('admin.reports.resolve');
+});
+
 // Guest Routes (for unauthenticated users only)
 Route::middleware('guest')->group(function () {
     Route::get('/signin', [AuthController::class, 'showLogin'])->name('login');
@@ -38,6 +52,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::get('/debug/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']);
 
     // Auth
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
