@@ -198,24 +198,6 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                             }}
                                                             className="inline-block"
                                                         >
-                                                            <button
-                                                                onClick={() => {
-                                                                    if (confirm('Are you sure you want to cancel this booking?')) {
-                                                                        router.post(`/my-bookings/${booking.id}/cancel`, {}, {
-                                                                            onSuccess: () => {
-                                                                                // Optional: Show success message
-                                                                                window.location.reload();
-                                                                            },
-                                                                            onError: () => {
-                                                                                alert('Failed to cancel booking');
-                                                                            },
-                                                                        });
-                                                                    }
-                                                                }}
-                                                                className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors font-medium"
-                                                            >
-                                                                Cancel
-                                                            </button>
                                                         </form>
                                                         <Link
                                                             href={`/book-room/check-in/${booking.id}`}  // Changed from /bookings/${booking.id}/start-photo
