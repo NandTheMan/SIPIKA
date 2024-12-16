@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-regular-svg-icons";
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons'; // Added faUser
 import {
     faCalendarPlus,
     faGaugeHigh,
@@ -18,7 +18,7 @@ import NotificationPopover from '@/Components/NotificationPopover';
 
 const BookingStatus = ({ status }) => {
     const getStatusConfig = (status) => {
-        switch(status) {
+        switch (status) {
             case 'pending':
                 return {
                     icon: faHourglassHalf,
@@ -49,7 +49,7 @@ const BookingStatus = ({ status }) => {
                 };
             default:
                 return {
-                    icon: faCircleCheck,
+                    icon: faCircleCheck, // Consider a more neutral icon here, like faQuestionCircle
                     text: status,
                     color: 'text-gray-600',
                     bgColor: 'bg-gray-100'
@@ -60,9 +60,9 @@ const BookingStatus = ({ status }) => {
     const config = getStatusConfig(status);
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${config.color} ${config.bgColor}`}>
-            <FontAwesomeIcon icon={config.icon} className={status === 'in_progress' ? 'animate-spin' : ''} />
-            {config.text}
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${config.color} ${config.bgColor}`}>
+            <FontAwesomeIcon icon={config.icon} className={`${status === 'in_progress' ? 'animate-spin' : ''} text-base`} /> {/* Increased icon size */}
+            <span className="font-medium">{config.text}</span> {/* Made text bolder */}
         </span>
     );
 };
@@ -76,7 +76,6 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
         timeZone: 'Asia/Singapore'
     }));
 
-    // Update time every minute
     React.useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date().toLocaleTimeString('en-US', {
@@ -106,6 +105,7 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                 </div>
                 <div className="flex items-center gap-6">
                     <div className="text-white font-sfproreg">
+                        <FontAwesomeIcon icon={faUser} className="mr-2" /> {/* Added user icon */}
                         {auth.user.username} ({auth.user.major})
                     </div>
                     <button
@@ -115,11 +115,18 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                     >
                         <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
                     </button>
-                    <FontAwesomeIcon
-                        icon={faBell}
-                        className="text-white cursor-pointer hover:text-gray-200"
-                        onClick={() => setIsNotificationOpen(true)}
-                    />
+                    <div className="relative"> {/* Added relative positioning for the potential badge */}
+                        <FontAwesomeIcon
+                            icon={faBell}
+                            className="text-white cursor-pointer hover:text-gray-200"
+                            onClick={() => setIsNotificationOpen(true)}
+                        />
+                        {/* Example of a notification badge - uncomment and adjust as needed
+                        <span className="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
+                            3
+                        </span>
+                        */}
+                    </div>
                     <MenuDropdown />
                 </div>
             </header>
@@ -132,30 +139,30 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                         <Link
                             href="/quick-book"
-                            className="flex items-center gap-4 bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]"
+                            className="group flex items-center gap-4 bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]"
                         >
-                            <div className="p-3 bg-white/20 rounded-lg">
+                            <div className="p-3 bg-white/20 group-hover:bg-white/30 rounded-lg transition-colors duration-300">
                                 <FontAwesomeIcon icon={faGaugeHigh} className="text-2xl" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold">Quick Book</h3>
-                                <p className="text-white/80">Instantly find and book available rooms</p>
+                                <h3 className="text-xl font-bold group-hover:text-white/90">Quick Book</h3>
+                                <p className="text-white/80 group-hover:text-white/70">Instantly find and book available rooms</p>
                             </div>
-                            <FontAwesomeIcon icon={faArrowRight} className="ml-auto text-xl" />
+                            <FontAwesomeIcon icon={faArrowRight} className="ml-auto text-xl transition-transform group-hover:translate-x-1" /> {/* Added animation on hover */}
                         </Link>
 
                         <Link
                             href="/book-room"
-                            className="flex items-center gap-4 bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]"
+                            className="group flex items-center gap-4 bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]"
                         >
-                            <div className="p-3 bg-white/20 rounded-lg">
+                            <div className="p-3 bg-white/20 group-hover:bg-white/30 rounded-lg transition-colors duration-300">
                                 <FontAwesomeIcon icon={faCalendarPlus} className="text-2xl" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold">New Booking</h3>
-                                <p className="text-white/80">Choose your preferred classroom</p>
+                                <h3 className="text-xl font-bold group-hover:text-white/90">New Booking</h3>
+                                <p className="text-white/80 group-hover:text-white/70">Choose your preferred classroom</p>
                             </div>
-                            <FontAwesomeIcon icon={faArrowRight} className="ml-auto text-xl" />
+                            <FontAwesomeIcon icon={faArrowRight} className="ml-auto text-xl transition-transform group-hover:translate-x-1" /> {/* Added animation on hover */}
                         </Link>
                     </div>
 
@@ -185,21 +192,22 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                 <div className="grid grid-cols-2 gap-4 text-gray-600">
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Date</p>
-                                                        <p>{booking.date}</p>
+                                                        <p className="font-medium">{booking.date}</p> {/* Made date bolder */}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Time</p>
-                                                        <p>{booking.start_time} - {booking.end_time}</p>
+                                                        <p className="font-medium">{booking.start_time} - {booking.end_time}</p> {/* Made time bolder */}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Duration</p>
-                                                        <p>{booking.duration}</p>
+                                                        <p className="font-medium">{booking.duration}</p> {/* Made duration bolder */}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-3">
                                                 {booking.status === 'pending' && (
                                                     <>
+                                                        {/* Cancel Form - Consider moving this to the details page for a cleaner UI
                                                         <form
                                                             onSubmit={(e) => {
                                                                 e.preventDefault();
@@ -207,9 +215,16 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                             }}
                                                             className="inline-block"
                                                         >
+                                                            <button
+                                                                type="submit"
+                                                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                                                            >
+                                                                Cancel
+                                                            </button>
                                                         </form>
+                                                        */}
                                                         <Link
-                                                            href={`/book-room/check-in/${booking.id}`}  // Changed from /bookings/${booking.id}/start-photo
+                                                            href={`/book-room/check-in/${booking.id}`}
                                                             className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
                                                         >
                                                             Start Check-in
@@ -220,8 +235,8 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                     href={`/my-bookings/${booking.id}`}
                                                     className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                                 >
-                                                    <FontAwesomeIcon icon={faEye} />
-                                                    Details
+                                                    <FontAwesomeIcon icon={faEye} className="text-sm" /> {/* Smaller icon */}
+                                                    <span className="font-medium">Details</span> {/* Made text bolder */}
                                                 </Link>
                                             </div>
                                         </div>
@@ -230,9 +245,9 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                             ) : (
                                 <div className="text-center py-12">
                                     <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                        <FontAwesomeIcon icon={faCalendarPlus} className="text-2xl text-gray-400" />
+                                        <FontAwesomeIcon icon={faCalendarPlus} className="text-3xl text-gray-400" /> {/* Increased icon size */}
                                     </div>
-                                    <p className="text-gray-500 text-lg">No active bookings</p>
+                                    <p className="text-gray-500 text-lg font-medium">No active bookings</p> {/* Made text bolder */}
                                     <p className="text-gray-400 mt-1">Your current bookings will appear here</p>
                                 </div>
                             )}
@@ -258,15 +273,15 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                 <div className="grid grid-cols-2 gap-4 text-gray-600">
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Date</p>
-                                                        <p>{booking.date}</p>
+                                                        <p className="font-medium">{booking.date}</p> {/* Made date bolder */}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Time</p>
-                                                        <p>{booking.start_time} - {booking.end_time}</p>
+                                                        <p className="font-medium">{booking.start_time} - {booking.end_time}</p> {/* Made time bolder */}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-500">Duration</p>
-                                                        <p>{booking.duration}</p>
+                                                        <p className="font-medium">{booking.duration}</p> {/* Made duration bolder */}
                                                     </div>
                                                 </div>
                                             </div>
@@ -274,8 +289,8 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                                                 href={`/my-bookings/${booking.id}`}
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                                             >
-                                                <FontAwesomeIcon icon={faEye} />
-                                                Details
+                                                <FontAwesomeIcon icon={faEye} className="text-sm" /> {/* Smaller icon */}
+                                                <span className="font-medium">Details</span> {/* Made text bolder */}
                                             </Link>
                                         </div>
                                     </div>
@@ -283,9 +298,9 @@ const BookingList = ({ auth, activeBookings = [], pastBookings = [] }) => {
                             ) : (
                                 <div className="text-center py-12">
                                     <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                        <FontAwesomeIcon icon={faCalendarPlus} className="text-2xl text-gray-400" />
+                                        <FontAwesomeIcon icon={faCalendarPlus} className="text-3xl text-gray-400" /> {/* Increased icon size */}
                                     </div>
-                                    <p className="text-gray-500 text-lg">No past bookings</p>
+                                    <p className="text-gray-500 text-lg font-medium">No past bookings</p> {/* Made text bolder */}
                                     <p className="text-gray-400 mt-1">Your booking history will appear here</p>
                                 </div>
                             )}

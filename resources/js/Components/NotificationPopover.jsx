@@ -1,28 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from '@inertiajs/react';
-import { Bell, Pin, Heart, XCircle } from 'lucide-react';
+import { Bell, Heart, XCircle, Pin } from 'lucide-react';
 
-const NotificationPopover = ({ isOpen, onClose, pinnedClassrooms = [], onPin, onUnpin }) => {
-    const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (isOpen && pinnedClassrooms.length > 0) {
-            fetchClassroomAvailability();
-        }
-    }, [isOpen, pinnedClassrooms]);
-
-    const fetchClassroomAvailability = async () => {
-        setLoading(true);
-        try {
-            const response = await window.axios.get('/api/pinned-classrooms');
-            setNotifications(response.data);
-        } catch (error) {
-            console.error('Error fetching classroom availability:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+const NotificationPopover = ({ isOpen, onClose, pinnedClassroomData = [], onPin, onUnpin }) => {
+    // Tidak perlu state notifications dan loading lagi karena data di-fetch di parent
 
     if (!isOpen) return null;
 
@@ -47,13 +28,15 @@ const NotificationPopover = ({ isOpen, onClose, pinnedClassrooms = [], onPin, on
 
                 {/* Content */}
                 <div className="overflow-y-auto max-h-[calc(80vh-4rem)]">
-                    {loading ? (
-                        <div className="flex items-center justify-center p-8">
-                            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    {pinnedClassroomData.length === 0 ? (
+                        <div className="p-8 text-center text-gray-500">
+                            <Pin className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                            <p>No pinned classrooms yet.</p>
+                            <p className="text-sm mt-1">Pin your favorite classrooms to get quick availability updates.</p>
                         </div>
-                    ) : notifications.length > 0 ? (
+                    ) : (
                         <div className="divide-y">
-                            {notifications.map((notification) => (
+                            {pinnedClassroomData.map((notification) => (
                                 <div key={notification.id} className="p-4 hover:bg-gray-50">
                                     <div className="flex items-start justify-between">
                                         <div>
@@ -92,12 +75,6 @@ const NotificationPopover = ({ isOpen, onClose, pinnedClassrooms = [], onPin, on
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    ) : (
-                        <div className="p-8 text-center text-gray-500">
-                            <Pin className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                            <p>No pinned classrooms yet.</p>
-                            <p className="text-sm mt-1">Pin your favorite classrooms to get quick availability updates.</p>
                         </div>
                     )}
                 </div>

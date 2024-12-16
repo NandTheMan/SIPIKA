@@ -41,9 +41,9 @@ function FloorView({ floorNumber, classrooms, onClose, pinnedClassrooms, setPinn
                                     isPinned={pinnedClassrooms.includes(classroom.id)}
                                     onPinChange={(isPinned) => {
                                         if (isPinned) {
-                                            setPinnedClassrooms([...pinnedClassrooms, classroom.id]);
+                                            setPinnedClassrooms((prevPinnedClassrooms) => [...prevPinnedClassrooms, classroom.id]);
                                         } else {
-                                            setPinnedClassrooms(pinnedClassrooms.filter(id => id !== classroom.id));
+                                            setPinnedClassrooms((prevPinnedClassrooms) => prevPinnedClassrooms.filter((id) => id !== classroom.id));
                                         }
                                     }}
                                 />
@@ -83,30 +83,31 @@ function FloorView({ floorNumber, classrooms, onClose, pinnedClassrooms, setPinn
 }
 
 export default function Homepage({
-                                     bookingData = [],
-                                     reportData = [],
-                                     userName,
-                                     userMajor,
-                                     classroomsByFloor = {},
-                                     canBookRoom
-                                 }) {
+    bookingData = [],
+    reportData = [],
+    userName,
+    userMajor,
+    classroomsByFloor = {},
+    canBookRoom
+}) {
     const [date, setDate] = useState(new Date());
     const [selectedFloor, setSelectedFloor] = useState(null);
     const [dateBookings, setDateBookings] = useState(bookingData);
     const [isLoading, setIsLoading] = useState(false);
     const [pinnedClassrooms, setPinnedClassrooms] = useState([]);
+    const [pinnedClassroomData, setPinnedClassroomData] = useState([]);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const handleDateChange = (newDate) => {
         setDate(newDate);
         fetchBookingsForDate(newDate);
     };
 
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-
     useEffect(() => {
         const fetchPinnedClassrooms = async () => {
             try {
                 const response = await axios.get('/api/pinned-classrooms');
+                setPinnedClassroomData(response.data);
                 setPinnedClassrooms(response.data.map(pc => pc.classroom_id));
             } catch (error) {
                 console.error('Error fetching pinned classrooms:', error);
@@ -119,7 +120,6 @@ export default function Homepage({
     const fetchBookingsForDate = async (selectedDate) => {
         setIsLoading(true);
         try {
-            // Adjust the date to local timezone to prevent offset
             const localDate = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000))
                 .toISOString()
                 .split('T')[0];
@@ -160,7 +160,7 @@ export default function Homepage({
                         onClick={handleLogout}
                         className="text-white hover:text-gray-200 transition-colors"
                     >
-                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl"/>
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
                     </button>
                     <FontAwesomeIcon
                         icon={faBell}
@@ -190,10 +190,6 @@ export default function Homepage({
 
                     {/* Asset Gedung Dekanat */}
                     <div className='relative flex justify-center h-[842px] mb-16'>
-                        {/*
-                            Note: The hover animations (translate-x) are preserved.
-                            You can further adjust transitions if desired.
-                        */}
                         <img
                             className="absolute z-[10] hover:translate-x-[60px] transition-transform duration-300 cursor-pointer drop-shadow-xl"
                             src="/images/lantai4.png"
@@ -239,14 +235,14 @@ export default function Homepage({
                             href="/quick-book"
                             className='flex bg-[#2D3C93] w-fit items-center gap-3 py-3 px-6 rounded-2xl hover:bg-[#1e2a6a] transition-colors text-white font-semibold shadow'
                         >
-                            <FontAwesomeIcon icon={faGauge} className='fa-xl'/>
+                            <FontAwesomeIcon icon={faGauge} className='fa-xl' />
                             <p className='text-[20px]'>Quick Book</p>
                         </Link>
                         <Link
                             href="/book-room"
                             className='w-fit h-100 bg-[#B6B6B6] px-6 flex items-center rounded-2xl hover:bg-[#8ea0c1] transition-colors text-white shadow'
                         >
-                            <FontAwesomeIcon icon={faMagnifyingGlass} className='fa-xl'/>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className='fa-xl' />
                         </Link>
                     </div>
                 </div>
@@ -277,47 +273,47 @@ export default function Homepage({
                                 <div className='border border-gray-200 rounded-lg shadow-md overflow-auto max-h-[350px]'>
                                     <table className='w-full table-auto border-collapse'>
                                         <thead className='bg-[#2D3C93] text-white'>
-                                        <tr>
-                                            <th className='py-3 px-4 text-left font-semibold'>Ruang</th>
-                                            <th className='py-3 px-4 text-left font-semibold'>Peminjam</th>
-                                            <th className='py-3 px-4 text-left font-semibold'>Waktu</th>
-                                            <th className='py-3 px-4 font-semibold text-center w-[16%]'>Aksi</th>
-                                        </tr>
+                                            <tr>
+                                                <th className='py-3 px-4 text-left font-semibold'>Ruang</th>
+                                                <th className='py-3 px-4 text-left font-semibold'>Peminjam</th>
+                                                <th className='py-3 px-4 text-left font-semibold'>Waktu</th>
+                                                <th className='py-3 px-4 font-semibold text-center w-[16%]'>Aksi</th>
+                                            </tr>
                                         </thead>
                                         <tbody className='divide-y divide-gray-200'>
-                                        {isLoading ? (
-                                            <tr>
-                                                <td colSpan="4" className="text-center py-4">
-                                                    <div className="flex items-center justify-center">
-                                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                                                        <span className="ml-2">Loading...</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ) : dateBookings.length > 0 ? (
-                                            dateBookings.map((item) => (
-                                                <tr key={item.id} className="hover:bg-gray-100 transition-colors even:bg-gray-50">
-                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.ruang}</td>
-                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.peminjam}</td>
-                                                    <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
-                                                    <td className='py-2 px-4 whitespace-nowrap text-center'>
-                                                        <Link
-                                                            href={`/my-bookings/${item.id}`}
-                                                            className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors text-sm font-medium'
-                                                        >
-                                                            <FontAwesomeIcon icon={faEye} className='fa-sm'/>
-                                                            <span>Lihat</span>
-                                                        </Link>
+                                            {isLoading ? (
+                                                <tr>
+                                                    <td colSpan="4" className="text-center py-4">
+                                                        <div className="flex items-center justify-center">
+                                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                                            <span className="ml-2">Loading...</span>
+                                                        </div>
                                                     </td>
                                                 </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4" className="text-center py-4 text-gray-500">
-                                                    Tidak ada peminjaman untuk tanggal ini
-                                                </td>
-                                            </tr>
-                                        )}
+                                            ) : dateBookings.length > 0 ? (
+                                                dateBookings.map((item) => (
+                                                    <tr key={item.id} className="hover:bg-gray-100 transition-colors even:bg-gray-50">
+                                                        <td className='py-2 px-4 whitespace-nowrap'>{item.ruang}</td>
+                                                        <td className='py-2 px-4 whitespace-nowrap'>{item.peminjam}</td>
+                                                        <td className='py-2 px-4 whitespace-nowrap'>{item.waktu}</td>
+                                                        <td className='py-2 px-4 whitespace-nowrap text-center'>
+                                                            <Link
+                                                                href={`/my-bookings/${item.id}`}
+                                                                className='inline-flex items-center gap-2 bg-[#2D3C93] text-white px-3 py-2 rounded hover:bg-[#1e2a6a] transition-colors text-sm font-medium'
+                                                            >
+                                                                <FontAwesomeIcon icon={faEye} className='fa-sm' />
+                                                                <span>Lihat</span>
+                                                            </Link>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="4" className="text-center py-4 text-gray-500">
+                                                        Tidak ada peminjaman untuk tanggal ini
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -333,7 +329,7 @@ export default function Homepage({
 
             <footer className='w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] text-white p-10 flex flex-col md:flex-row md:justify-between gap-10'>
                 <div className='flex-1'>
-                    <img src="/images/logo.png" alt="logo-sipika" width={200} className='mb-6'/>
+                    <img src="/images/logo.png" alt="logo-sipika" width={200} className='mb-6' />
                     <p className='text-gray-200 text-sm max-w-sm'>
                         Platform peminjaman ruangan Gedung Dekanat Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Udayana
                     </p>
@@ -373,23 +369,27 @@ export default function Homepage({
             <NotificationPopover
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
-                pinnedClassrooms={classroomsByFloor[selectedFloor]?.filter(classroom =>
-                    pinnedClassrooms.includes(classroom.id)
-                ) || []}
+                pinnedClassroomData={pinnedClassroomData}
                 onPin={async (classroomId) => {
-                    try {
-                        await axios.post('/api/classrooms/pin', { classroom_id: classroomId });
-                        setPinnedClassrooms([...pinnedClassrooms, classroomId]);
-                    } catch (error) {
-                        console.error('Error pinning classroom:', error);
+                    if (!pinnedClassrooms.includes(classroomId)) {
+                        try {
+                            await axios.post('/api/classrooms/pin', { classroom_id: classroomId });
+                            setPinnedClassrooms((prevPinnedClassrooms) => [...prevPinnedClassrooms, classroomId]);
+                        } catch (error) {
+                            console.error('Error pinning classroom:', error);
+                        }
                     }
                 }}
                 onUnpin={async (classroomId) => {
-                    try {
-                        await axios.post('/api/classrooms/unpin', { classroom_id: classroomId });
-                        setPinnedClassrooms(pinnedClassrooms.filter(id => id !== classroomId));
-                    } catch (error) {
-                        console.error('Error unpinning classroom:', error);
+                    if (pinnedClassrooms.includes(classroomId)) {
+                        try {
+                            await axios.post('/api/classrooms/unpin', { classroom_id: classroomId });
+                            setPinnedClassrooms((prevPinnedClassrooms) =>
+                                prevPinnedClassrooms.filter((id) => id !== classroomId)
+                            );
+                        } catch (error) {
+                            console.error('Error unpinning classroom:', error);
+                        }
                     }
                 }}
             />

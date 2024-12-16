@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-regular-svg-icons";
-import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faUser } from "@fortawesome/free-regular-svg-icons"; // Added faUser
+import { faSignOutAlt, faBan } from "@fortawesome/free-solid-svg-icons"; // Added faBan for penalized status
 import { Calendar as CalendarIcon, Clock, Users, ChevronRight, Info, Loader2 } from 'lucide-react';
 import Calendar from 'react-calendar';
 import Datetime from 'react-datetime';
@@ -56,7 +56,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
         <div className="min-h-screen bg-lightGradient font-inter">
             <Head title="Quick Book" />
 
-            {/* Header (from Homepage.jsx) */}
+            {/* Header */}
             <header className='w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center'>
                 <div>
                     <Link href="/">
@@ -65,6 +65,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                 </div>
                 <div className='flex items-center gap-6'>
                     <div className='text-white font-sfproreg'>
+                        <FontAwesomeIcon icon={faUser} className="mr-2" /> {/* Added user icon */}
                         {auth.user.username} ({auth.user.major})
                     </div>
                     <button
@@ -73,11 +74,18 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                     >
                         <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
                     </button>
-                    <FontAwesomeIcon
-                        icon={faBell}
-                        className="text-white cursor-pointer hover:text-gray-200"
-                        onClick={() => setIsNotificationOpen(true)}
-                    />
+                    <div className="relative">
+                        <FontAwesomeIcon
+                            icon={faBell}
+                            className="text-white cursor-pointer hover:text-gray-200"
+                            onClick={() => setIsNotificationOpen(true)}
+                        />
+                        {/* Notification Badge - Uncomment and adjust as needed
+                        <span className="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-red-500 text-white rounded-full text-xs">
+                            3
+                        </span>
+                        */}
+                    </div>
                     <MenuDropdown />
                 </div>
             </header>
@@ -90,33 +98,34 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                     </p>
 
                     {/* Class Info Card */}
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-8">
-                        <div className="flex items-start justify-between">
-                            <div className='flex items-start gap-4'>
-                                <Users className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mb-8 flex items-center justify-between">
+                        <div className='flex items-start gap-4'>
+                            <Users className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                            <div>
+                                <h3 className="font-semibold text-blue-800 flex items-center gap-2">
+                                    Your Class Information
+                                </h3>
+                                <p className="text-blue-700">Class Size: <span className="font-medium">{userInfo.class_size} students</span></p>
+                                <p className="text-blue-700">Major: <span className="font-medium">{userInfo.major}</span></p>
+                                <p className="text-blue-700">Year: <span className="font-medium">{userInfo.year}</span></p>
+                            </div>
+                        </div>
+                        {userInfo.is_penalized && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
+                                <FontAwesomeIcon icon={faBan} className="h-5 w-5 text-red-400" />
                                 <div>
-                                    <h3 className="font-semibold text-blue-800 flex items-center gap-2">
-                                        Your Class Information
-                                    </h3>
-                                    <p className="text-blue-700">Class Size: <span className="font-medium">{userInfo.class_size} students</span></p>
-                                    <p className="text-blue-700">Major: <span className="font-medium">{userInfo.major}</span></p>
-                                    <p className="text-blue-700">Year: <span className="font-medium">{userInfo.year}</span></p>
+                                    <p className="font-semibold text-red-800">Account Penalized</p>
+                                    <p className="text-sm text-red-600">Some booking restrictions may apply</p>
                                 </div>
                             </div>
-                            {userInfo.is_penalized && (
-                                <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg shadow-md">
-                                    <p className="font-semibold">Account Penalized</p>
-                                    <p className="text-sm">Some booking restrictions may apply</p>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label className="block text-gray-700 font-medium mb-2">
-                                    <CalendarIcon className="w-5 h-5 inline-block mr-2" />
+                                    <CalendarIcon className="w-5 h-5 inline-block mr-2 text-gray-600" /> {/* Added color to icon */}
                                     Date
                                 </label>
                                 <div className='border border-gray-300 rounded-lg p-3'>
@@ -135,7 +144,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        <Clock className="w-5 h-5 inline-block mr-2" />
+                                        <Clock className="w-5 h-5 inline-block mr-2 text-gray-600" /> {/* Added color to icon */}
                                         Start Time
                                     </label>
                                     <Datetime
@@ -175,11 +184,11 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                             </div>
                         </div>
 
-                        {/* Validation Error Summary (New) */}
+                        {/* Validation Error Summary */}
                         {Object.keys(errors).length > 0 && (
                             <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-                                <p className="font-bold text-red-700">Please fix the following error(s):</p>
-                                <ul className="list-disc list-inside text-red-600">
+                                <p className="font-semibold text-red-700">Please fix the following error(s):</p>
+                                <ul className="list-disc list-inside text-red-600 mt-1">
                                     {Object.values(errors).map((error, index) => (
                                         <li key={index}>{error}</li>
                                     ))}
@@ -191,7 +200,7 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                         <div className="bg-blue-50 rounded-lg p-6 space-y-4 border border-blue-200">
                             <div className='flex gap-2 items-center'>
                                 <Info className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                <h4 className="font-semibold text-gray-700">How Quick Book Works:</h4>
+                                <h4 className="font-medium text-gray-700">How Quick Book Works:</h4>
                             </div>
                             <ul className="space-y-2 text-gray-600">
                                 <li className="flex items-start gap-2">
@@ -217,14 +226,14 @@ const QuickBook = ({ auth, userInfo, sksDurations }) => {
                         <div className="flex justify-between pt-4">
                             <Link
                                 href="/home"
-                                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
                             >
                                 Cancel
                             </Link>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2 font-medium"
                             >
                                 {processing && <Loader2 className="h-4 w-4 animate-spin" />}
                                 {processing ? 'Finding Room...' : 'Find & Book Classroom'}
