@@ -4,6 +4,7 @@ import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link, router } from '@inertiajs/react';
 import MenuDropdown from '@/Components/MenuDropdown';
+import NotificationPopover from '@/Components/NotificationPopover';
 
 export default function BookingDetailsPage({ auth, bookingData }) {
     const [currentStep, setCurrentStep] = useState(2);

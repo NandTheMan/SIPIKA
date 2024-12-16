@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Classroom;
+use App\Http\Controllers\RoomBookingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -43,3 +44,5 @@ Route::post('/classrooms/unpin', function (Request $request) {
 
     return response()->json(['message' => 'Classroom unpinned successfully']);
 });
+
+Route::post('/book-room/api/check-availability', [RoomBookingController::class, 'checkAvailability']);

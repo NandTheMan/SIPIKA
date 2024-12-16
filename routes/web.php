@@ -85,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('my-bookings.cancel');
     });
 
-    // New React-based Booking System
+// In web.php, update the book-room routes section:
     Route::prefix('book-room')->group(function () {
         Route::get('/', [RoomBookingController::class, 'index'])->name('booking.index');
         Route::get('/details', [RoomBookingController::class, 'showDetails'])
@@ -100,15 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/check-out/{booking}', [RoomBookingController::class, 'showCheckOut'])->name('booking.check-out');
         Route::post('/check-out/{booking}', [RoomBookingController::class, 'processCheckOut'])->name('booking.process-check-out');
 
-        // API endpoints for React components
-        Route::prefix('api')->group(function () {
-            Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails'])
-                ->middleware('throttle:60,1');
-            Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability'])
-                ->middleware(['throttle:60,1', 'csrf']);
-            Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor'])
-                ->middleware('throttle:60,1');
-        });
+        // Update these routes - note the order is important
+        Route::get('/rooms/floor/{floor}', [RoomBookingController::class, 'getRoomsByFloor']);
+        Route::get('/rooms/{id}', [RoomBookingController::class, 'getRoomDetails']); // Put specific routes before generic ones
+        Route::post('/check-availability', [RoomBookingController::class, 'checkAvailability'])
+            ->name('booking.check-availability');
     });
 
     Route::get('/api/pinned-classrooms', [PinController::class, 'getPinnedClassrooms']);

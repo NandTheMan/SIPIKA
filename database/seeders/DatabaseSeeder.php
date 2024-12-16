@@ -273,7 +273,6 @@ class DatabaseSeeder extends Seeder
         $classrooms = Classroom::all();
 
         foreach ($users as $user) {
-            // Pin 2-3 random classrooms for each user
             $pinnedCount = rand(2, 3);
             $randomClassrooms = $classrooms->random($pinnedCount);
 

@@ -119,30 +119,29 @@ class RoomBookingController extends Controller
                         }
                     },
                 ],
-                'duration' => 'required|integer|min:1|max:6' // Add duration validation
+                'duration' => 'required|integer|min:1|max:6'
             ]);
 
             $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
-            $endDateTime = SKSHelper::calculateEndTime($startDateTime, $request->duration);  // Use requested duration
+            $endDateTime = SKSHelper::calculateEndTime($startDateTime, $request->duration);
 
+            // Get existing bookings that overlap with the requested time period
             $existingBooking = Booking::where('classroom_id', $request->roomId)
                 ->whereIn('status', ['pending', 'in_progress'])
-                ->where(function($query) use ($startDateTime, $endDateTime) {
-                    $query->where(function($q) use ($startDateTime, $endDateTime) {
-                        $q->whereBetween('start_time', [$startDateTime, $endDateTime])
-                            ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
-                            ->orWhere(function($innerQ) use ($startDateTime, $endDateTime) {
-                                $innerQ->where('start_time', '<=', $startDateTime)
-                                    ->where('end_time', '>=', $endDateTime);
-                            });
-                    });
+                ->where(function ($query) use ($startDateTime, $endDateTime) {
+                    $query->whereBetween('start_time', [$startDateTime, $endDateTime])
+                        ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
+                        ->orWhere(function($q) use ($startDateTime, $endDateTime) {
+                            $q->where('start_time', '<=', $startDateTime)
+                                ->where('end_time', '>=', $endDateTime);
+                        });
                 })
                 ->first();
 
             \Log::info('Availability check', [
                 'roomId' => $request->roomId,
-                'startDateTime' => $startDateTime,
-                'endDateTime' => $endDateTime,
+                'startDateTime' => $startDateTime->format('Y-m-d H:i:s'),
+                'endDateTime' => $endDateTime->format('Y-m-d H:i:s'),
                 'existingBooking' => $existingBooking ? true : false
             ]);
 
