@@ -174,4 +174,53 @@ class ReactBookingController extends Controller
             $booking->update(['status' => 'cancelled']);
         }
     }
+
+    public function endEarly(Request $request, Booking $booking)
+    {
+        \Log::info('End Early Request received', [
+            'booking_id' => $booking->id,
+            'has_file' => $request->hasFile('image_end'),
+            'files' => $request->allFiles(),
+            'all_data' => $request->all(),
+            'method' => $request->method(),
+            'headers' => $request->headers->all(),
+        ]);
+
+        try {
+            if (!$request->hasFile('image_end')) {
+                throw new \Exception('No image file received');
+            }
+
+            $request->validate([
+                'image_end' => 'required|image|max:5120'
+            ]);
+
+            $imagePath = $request->file('image_end')->store('booking-images', 'public');
+
+            \Log::info('Image stored at: ' . $imagePath);
+
+            $result = $booking->update([
+                'url_image_end' => $imagePath,
+                'status' => 'finished',
+                'end_time' => now()
+            ]);
+
+            \Log::info('Update result', ['success' => $result, 'booking' => $booking->fresh()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking ended successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in endEarly:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Failed to end booking: ' . $e->getMessage()
+            ], 422);
+        }
+    }
 }

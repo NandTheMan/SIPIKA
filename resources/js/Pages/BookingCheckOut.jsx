@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, router } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faUser, faBars, faClockRotateLeft, faClock, faImage, faCircleExclamation, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faClock, faImage, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import MenuDropdown from '@/Components/MenuDropdown';
 
-export default function BookingCheckOut({ booking }) {
+export default function BookingCheckOut({ booking, auth }) {
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('en-US', {
@@ -69,14 +72,37 @@ export default function BookingCheckOut({ booking }) {
         post(`/book-room/check-out/${booking.id}`);
     };
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <div className="min-h-screen bg-lightGradient">
+        <div className="min-h-screen bg-lightGradient font-inter">
             {/* Header */}
-            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
-                <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/" className="text-4xl sm:text-5xl font-philosopher text-white hover:opacity-80">
-                        SIPIKA
+            <header className="w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center">
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
+                </div>
+                <div className="flex items-center gap-6">
+                    <div className="text-white font-sfproreg">
+                        {auth.user.username} ({auth.user.major})
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 

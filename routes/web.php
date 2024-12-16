@@ -83,6 +83,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{booking}', [ReactBookingController::class, 'show'])->name('my-bookings.show');
         Route::post('/{booking}/cancel', [ReactBookingController::class, 'cancelBooking'])
             ->name('my-bookings.cancel');
+        Route::post('/{booking}/end-early', [ReactBookingController::class, 'endEarly'])
+            ->name('my-bookings.end-early');
     });
 
 // In web.php, update the book-room routes section:
@@ -138,7 +140,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{booking}/end-photo', [BookingController::class, 'uploadEndPhoto'])->name('bookings.upload-end-photo');
         Route::get('/{booking}', [BookingController::class, 'show'])->name('bookings.show');
         Route::put('/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
-        Route::put('/{booking}/end-early', [BookingController::class, 'endEarly'])->name('bookings.end-early');
+        Route::put('/{booking}/end-early', [ReactBookingController::class, 'endEarly'])
+            ->name('my-bookings.end-early');
     });
 
     // Legacy Reports (Admin Only)

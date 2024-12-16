@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faUser } from "@fortawesome/free-regular-svg-icons";
-import { faBars, faClock } from "@fortawesome/free-solid-svg-icons";
+import { faBell } from "@fortawesome/free-regular-svg-icons";
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import MenuDropdown from '@/Components/MenuDropdown.jsx';
 import NotificationPopover from '@/Components/NotificationPopover.jsx';
 
 const BookingDetail = ({ booking, auth }) => {
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [endPhoto, setEndPhoto] = useState(null);
+    const [showEndEarlyForm, setShowEndEarlyForm] = useState(false);
+
+    // Add useForm hook
+    const { post, processing } = useForm();
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -43,25 +48,71 @@ const BookingDetail = ({ booking, auth }) => {
         }
     };
 
+    const handleEndEarly = (e) => {
+        e.preventDefault();
+
+        if (!endPhoto) {
+            alert('Please select an image first');
+            return;
+        }
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('image_end', endPhoto);
+        formData.append('_method', 'PUT');
+
+        console.log('Submitting end-early request:', {
+            bookingId: booking.id,
+            fileSize: endPhoto.size,
+            fileName: endPhoto.name
+        });
+
+        // Change how we send the request
+        post(`/my-bookings/${booking.id}/end-early`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: (response) => {
+                console.log('Success response:', response);
+                window.location.href = '/my-bookings';
+            },
+            onError: (errors) => {
+                console.error('Submission error:', errors);
+                alert(errors.error || 'Failed to end booking. Please try again.');
+            },
+        });
+    };
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <div className="min-h-screen bg-lightGradient">
+        <div className="min-h-screen bg-lightGradient font-inter">
             {/* Header */}
-            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
-                <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/home" className="text-4xl sm:text-6xl font-philosopher text-white hover:opacity-80">
-                        SIPIKA
+            <header className="w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center">
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
                 </div>
-                <div className='absolute top-8 right-6 sm:top-8 sm:right-8 flex items-center gap-4 sm:gap-6'>
-                    <div className='flex items-center gap-2 sm:gap-3'>
-                        <FontAwesomeIcon icon={faUser} className="text-white text-lg sm:text-xl" />
-                        <p className='text-white text-sm sm:text-base'>
-                            {auth.user.username} ({auth.user.major})
-                        </p>
+                <div className="flex items-center gap-6">
+                    <div className="text-white font-sfproreg">
+                        {auth.user.username} ({auth.user.major})
                     </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
                     <FontAwesomeIcon
                         icon={faBell}
-                        className="text-white text-lg sm:text-xl cursor-pointer hover:text-gray-300"
+                        className="text-white cursor-pointer hover:text-gray-200"
                         onClick={() => setIsNotificationOpen(true)}
                     />
                     <MenuDropdown />
@@ -191,12 +242,57 @@ const BookingDetail = ({ booking, auth }) => {
                             )}
 
                             {booking.can_end_early && (
-                                <Link
-                                    href={`/bookings/${booking.id}/end-photo`}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                >
-                                    End Early
-                                </Link>
+                                <>
+                                    {!showEndEarlyForm ? (
+                                        <button
+                                            onClick={() => setShowEndEarlyForm(true)}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                        >
+                                            End Early
+                                        </button>
+                                    ) : (
+                                        <form
+                                            onSubmit={handleEndEarly}
+                                            encType="multipart/form-data"
+                                            className="flex gap-2"
+                                        >
+                                            <input
+                                                type="file"
+                                                name="image_end"
+                                                onChange={(e) => setEndPhoto(e.target.files[0])}
+                                                accept="image/*"
+                                                required
+                                                className="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-blue-700
+                        hover:file:bg-blue-100"
+                                            />
+                                            <button
+                                                type="submit"
+                                                disabled={!endPhoto}
+                                                className={`px-4 py-2 rounded ${
+                                                    endPhoto
+                                                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                Submit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowEndEarlyForm(false);
+                                                    setEndPhoto(null);
+                                                }}
+                                                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    )}
+                                </>
                             )}
 
                             <Link

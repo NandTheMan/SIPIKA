@@ -59,23 +59,6 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         return () => window.removeEventListener('resize', calculateHeights);
     }, []);
 
-    // Fetch room details when a room is selected
-    useEffect(() => {
-        const fetchRoomDetails = async () => {
-            if (selectedRoom) {
-                try {
-                    const details = await getRoomDetails(selectedRoom);
-                    setRoomData(details);
-                } catch (error) {
-                    console.error('Error fetching room details:', error);
-                    setRoomData(null);
-                }
-            }
-        };
-
-        fetchRoomDetails();
-    }, [selectedRoom]);
-
     // Check room availability
     useEffect(() => {
         const checkAvailability = async () => {
@@ -130,15 +113,11 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
         setSelectedRoom(roomId);
         setCurrentStep(2); // Move to the next step when a room is selected
 
-        axios
-            .get(`/book-room/api/rooms/${roomId}`)
-            .then((response) => {
-                setRoomData(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching room details:', error);
-                setRoomData(null);
-            });
+        // Fetch room details when a room is selected
+        const selectedRoomDetails = classroomsByFloor[currentFloor].find(
+            (room) => room.id === roomId
+        );
+        setRoomData(selectedRoomDetails);
     };
 
     const handleNextClick = () => {
@@ -430,22 +409,48 @@ export default function BookingPage({ userName, userMajor, classroomsByFloor }) 
                                     <button type="button" className="mt-6"></button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-6">
-                                    {(classroomsByFloor[currentFloor] || []).map((room) => (
-                                        <div
-                                            key={room.id}
-                                            onClick={() => handleRoomSelect(room.id)}
-                                            className={`room-tile ${
-                                                selectedRoom === room.id
-                                                    ? 'bg-buttonBlue text-white'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            } rounded-lg px-6 py-6 shadow-lg cursor-pointer transition-colors duration-200 flex items-center justify-center text-center`}
-                                            style={{ cursor: 'pointer' }} // Explicitly set cursor
-                                        >
-                                            <p className="font-bold text-lg">{room.name}</p>
+                                <>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-6">
+                                        {(classroomsByFloor[currentFloor] || []).map((room) => (
+                                            <div
+                                                key={room.id}
+                                                onClick={() => handleRoomSelect(room.id)}
+                                                className={`room-tile ${
+                                                    selectedRoom === room.id
+                                                        ? 'bg-buttonBlue text-white'
+                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                } rounded-lg px-6 py-6 shadow-lg cursor-pointer transition-colors duration-200 flex items-center justify-center text-center`}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <p className="font-bold text-lg">{room.name}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Detail Kelas */}
+                                    {roomData && (
+                                        <div className="p-4 bg-gray-50 rounded-lg">
+                                            <h4 className="font-bold text-gray-800">{roomData.name}</h4>
+                                            <p className="text-sm text-gray-600">
+                                                Kapasitas: {roomData.capacity} orang
+                                            </p>
+                                            <div className="mt-3">
+                                                <p className="text-sm font-medium text-gray-600">
+                                                    Fasilitas:
+                                                </p>
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                    {roomData.facilities.map((facility, idx) => (
+                                                        <span
+                                                            key={idx}
+                                                            className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                                                        >
+                                                            {facility}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    )}
+                                </>
                             )}
                         </div>
                         <div className="border-white/40 border bg-glassGradient backdrop-blur-xl shadow-md rounded-3xl p-6 flex flex-col sm:flex-row justify-between mt-1 w-full">

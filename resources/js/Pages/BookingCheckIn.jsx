@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, router } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faUser, faBars, faClockRotateLeft, faClock, faImage, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faClockRotateLeft, faClock, faImage, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import MenuDropdown from '@/Components/MenuDropdown';
 
-export default function BookingCheckIn({ booking }) {
+export default function BookingCheckIn({ booking, auth }) {
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [lineHeight1, setLineHeight1] = useState(0);
     const [lineHeight2, setLineHeight2] = useState(0);
     const [currentTime, setCurrentTime] = useState(booking.currentTime);
@@ -67,6 +70,11 @@ export default function BookingCheckIn({ booking }) {
         post(`/book-room/check-in/${booking.id}`);
     };
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     const renderStatus = () => {
         if (!booking.canStart && booking.minutesUntilStart > 0) {
             return (
@@ -104,17 +112,35 @@ export default function BookingCheckIn({ booking }) {
     };
 
     return (
-        <div className="min-h-screen bg-lightGradient">
+        <div className="min-h-screen bg-lightGradient font-inter">
             {/* Header */}
-            <header className='w-full h-fit bg-gradient-to-r from-[#0E122D] to-[#2D3C93] px-6 py-10 sm:px-8 sm:py-12 flex justify-between items-center relative'>
-                <div className="absolute top-8 left-4 sm:top-8 sm:left-8">
-                    <Link href="/" className="text-4xl sm:text-5xl font-philosopher text-white hover:opacity-80">
-                        SIPIKA
+            <header className="w-full bg-gradient-to-r from-[#0E122D] to-[#2D3C93] p-6 flex justify-between items-center">
+                <div>
+                    <Link href="/">
+                        <img src="/images/logo.png" alt="logo-sipika" width={146} />
                     </Link>
+                </div>
+                <div className="flex items-center gap-6">
+                    <div className="text-white font-sfproreg">
+                        {auth.user.username} ({auth.user.major})
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="text-xl" />
+                    </button>
+                    <FontAwesomeIcon
+                        icon={faBell}
+                        className="text-white cursor-pointer hover:text-gray-200"
+                        onClick={() => setIsNotificationOpen(true)}
+                    />
+                    <MenuDropdown />
                 </div>
             </header>
 
-            <div className="flex bg-lightGradient">
+            <div className="flex">
                 {/* Progress Steps */}
                 <div className="w-1/16 min-w-[80px] h-[52rem] place-self-center items-center justify-center border-1.5 border-white/60 bg-lightGradient shadow-xl rounded-lg p-4 my-12 ml-6 relative">
                     <div className="relative flex flex-col items-center h-full">
